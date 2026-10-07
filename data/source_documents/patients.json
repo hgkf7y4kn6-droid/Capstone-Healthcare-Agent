@@ -1,0 +1,727 @@
+{
+  "P001": {
+    "name": "John Smith",
+    "age": 70,
+    "gender": "Male",
+    "contact": "+1-555-0101",
+    "email": "john.smith@email.com",
+    "blood_type": "A+",
+    "conditions": [
+      "Chronic Kidney Disease Stage 3",
+      "Hypertension",
+      "Type 2 Diabetes"
+    ],
+    "medications": [
+      "Lisinopril 10mg",
+      "Amlodipine 5mg",
+      "Metformin 500mg"
+    ],
+    "last_visit": "2024-11-15",
+    "next_appointment": "2025-03-10",
+    "allergies": [
+      "Penicillin",
+      "Sulfa drugs"
+    ],
+    "doctor": "Dr. Mehta (Nephrologist)",
+    "visit_history": [
+      {
+        "date": "2024-11-15",
+        "reason": "Routine CKD checkup",
+        "notes": "Creatinine slightly elevated. Adjusted Lisinopril dosage."
+      },
+      {
+        "date": "2024-08-20",
+        "reason": "Hypertension follow-up",
+        "notes": "BP stable at 130/80. Continue current meds."
+      },
+      {
+        "date": "2024-05-10",
+        "reason": "Diabetes management",
+        "notes": "HbA1c at 7.2%. Diet counseling provided."
+      }
+    ],
+    "lab_results": {
+      "creatinine": "2.1 mg/dL",
+      "eGFR": "42 mL/min",
+      "HbA1c": "7.2%",
+      "blood_pressure": "132/82 mmHg"
+    },
+    "emergency_contact": {
+      "name": "Mary Smith",
+      "relation": "Spouse",
+      "phone": "+1-555-0102"
+    },
+    "notes": [
+      {
+        "date": "2026-03-17",
+        "time": "01:37",
+        "note": "Patient called in and reported that he cant make it on 22 march and needs an updated appointment"
+      },
+      {
+        "date": "2026-04-19",
+        "time": "19:04",
+        "note": "ok, I will contact Rajesh mehta next sunday. Please notify him asap"
+      },
+      {
+        "date": "2026-05-27",
+        "time": "04:08",
+        "note": "Patient mentioned that he would like to talk to a different doctor."
+      }
+    ],
+    "dob": "1979-03-15",
+    "address": "142 Maple Street, Springfield, IL 62701",
+    "ssn_last4": "4821"
+  },
+  "P002": {
+    "name": "Sarah Johnson",
+    "age": 45,
+    "gender": "Female",
+    "contact": "+1-555-0201",
+    "email": "sarah.johnson@email.com",
+    "blood_type": "O-",
+    "conditions": [
+      "Asthma",
+      "Anxiety Disorder",
+      "Hypothyroidism"
+    ],
+    "medications": [
+      "Albuterol inhaler",
+      "Levothyroxine 50mcg",
+      "Sertraline 25mg"
+    ],
+    "last_visit": "2025-01-08",
+    "next_appointment": "2025-04-08",
+    "allergies": [
+      "Aspirin",
+      "NSAIDs"
+    ],
+    "doctor": "Dr. Sharma (Pulmonologist)",
+    "visit_history": [
+      {
+        "date": "2025-01-08",
+        "reason": "Asthma flare-up",
+        "notes": "Prescribed short course of oral steroids. Inhaler technique reviewed."
+      },
+      {
+        "date": "2024-10-15",
+        "reason": "Thyroid follow-up",
+        "notes": "TSH within normal range. Continue Levothyroxine."
+      },
+      {
+        "date": "2024-07-22",
+        "reason": "Anxiety management",
+        "notes": "Sertraline dosage reviewed. CBT referral given."
+      }
+    ],
+    "lab_results": {
+      "TSH": "2.4 mIU/L",
+      "T4": "1.1 ng/dL",
+      "peak_flow": "380 L/min",
+      "blood_pressure": "118/74 mmHg"
+    },
+    "emergency_contact": {
+      "name": "Tom Johnson",
+      "relation": "Husband",
+      "phone": "+1-555-0202"
+    },
+    "documents": [
+      {
+        "date": "2026-03-16",
+        "time": "18:00",
+        "filename": "sarah_johnson_labs.pdf",
+        "chunks": 7,
+        "type": "uploaded_document"
+      }
+    ],
+    "dob": "1979-03-12",
+    "address": "88 Birchwood Ave, Austin, TX 73301",
+    "ssn_last4": "7734"
+  },
+  "P003": {
+    "name": "Robert Lee",
+    "age": 58,
+    "gender": "Male",
+    "contact": "+1-555-0301",
+    "email": "robert.lee@email.com",
+    "blood_type": "B+",
+    "conditions": [
+      "Coronary Artery Disease",
+      "High Cholesterol",
+      "Obesity"
+    ],
+    "medications": [
+      "Atorvastatin 40mg",
+      "Aspirin 81mg",
+      "Metoprolol 25mg"
+    ],
+    "last_visit": "2025-02-01",
+    "next_appointment": "2025-05-01",
+    "allergies": [
+      "Contrast dye"
+    ],
+    "doctor": "Dr. Nair (Cardiologist)",
+    "visit_history": [
+      {
+        "date": "2025-02-01",
+        "reason": "Post-stent follow-up",
+        "notes": "Recovery good. Continue dual antiplatelet therapy for 12 months."
+      },
+      {
+        "date": "2024-11-10",
+        "reason": "Chest pain evaluation",
+        "notes": "Stress test performed. Referred for coronary angiography."
+      },
+      {
+        "date": "2024-09-05",
+        "reason": "Cholesterol review",
+        "notes": "LDL still high at 145. Increased Atorvastatin to 40mg."
+      }
+    ],
+    "lab_results": {
+      "LDL": "118 mg/dL",
+      "HDL": "42 mg/dL",
+      "triglycerides": "210 mg/dL",
+      "blood_pressure": "138/88 mmHg",
+      "BMI": "31.2"
+    },
+    "emergency_contact": {
+      "name": "Linda Lee",
+      "relation": "Wife",
+      "phone": "+1-555-0302"
+    },
+    "address": "215 Cedar Lane, Denver, CO 80202",
+    "ssn_last4": "2290"
+  },
+  "P004": {
+    "name": "Priya Patel",
+    "age": 32,
+    "gender": "Female",
+    "contact": "+1-555-0401",
+    "email": "priya.patel@email.com",
+    "blood_type": "AB+",
+    "conditions": [
+      "Gestational Diabetes (resolved)",
+      "Iron Deficiency Anemia",
+      "Migraine"
+    ],
+    "medications": [
+      "Ferrous Sulfate 325mg",
+      "Sumatriptan 50mg (as needed)",
+      "Folic Acid 400mcg"
+    ],
+    "last_visit": "2025-01-20",
+    "next_appointment": "2025-03-20",
+    "allergies": [
+      "Latex"
+    ],
+    "doctor": "Dr. Singh (General Practitioner)",
+    "visit_history": [
+      {
+        "date": "2025-01-20",
+        "reason": "Anemia follow-up",
+        "notes": "Hemoglobin improved to 11.2. Continue iron supplements."
+      },
+      {
+        "date": "2024-12-05",
+        "reason": "Migraine management",
+        "notes": "Frequency increased. Sumatriptan prescribed for acute episodes."
+      },
+      {
+        "date": "2024-09-15",
+        "reason": "Post-partum checkup",
+        "notes": "Gestational diabetes resolved. Blood sugar normal. Monitor annually."
+      }
+    ],
+    "lab_results": {
+      "hemoglobin": "11.2 g/dL",
+      "ferritin": "8 ng/mL",
+      "fasting_glucose": "92 mg/dL",
+      "blood_pressure": "110/70 mmHg"
+    },
+    "emergency_contact": {
+      "name": "Raj Patel",
+      "relation": "Husband",
+      "phone": "+1-555-0402"
+    },
+    "address": "47 Willow Court, San Jose, CA 95112",
+    "ssn_last4": "5561"
+  },
+  "P005": {
+    "name": "Michael Brown",
+    "age": 65,
+    "gender": "Male",
+    "contact": "+1-555-0501",
+    "email": "michael.brown@email.com",
+    "blood_type": "A-",
+    "conditions": [
+      "COPD Stage 2",
+      "Osteoarthritis",
+      "Depression"
+    ],
+    "medications": [
+      "Tiotropium inhaler",
+      "Fluticasone/Salmeterol",
+      "Celecoxib 200mg",
+      "Escitalopram 10mg"
+    ],
+    "last_visit": "2025-02-10",
+    "next_appointment": "2025-04-10",
+    "allergies": [
+      "Codeine",
+      "Tramadol"
+    ],
+    "doctor": "Dr. Kumar (Pulmonologist)",
+    "visit_history": [
+      {
+        "date": "2025-02-10",
+        "reason": "COPD exacerbation",
+        "notes": "Antibiotics prescribed. Oxygen saturation 94%. Pulmonary rehab recommended."
+      },
+      {
+        "date": "2024-12-18",
+        "reason": "Knee pain (osteoarthritis)",
+        "notes": "X-ray shows moderate joint space narrowing. Physio referral given."
+      },
+      {
+        "date": "2024-10-01",
+        "reason": "Depression screening",
+        "notes": "PHQ-9 score 12. Started Escitalopram. Follow-up in 6 weeks."
+      }
+    ],
+    "lab_results": {
+      "FEV1": "58% predicted",
+      "oxygen_saturation": "94%",
+      "blood_pressure": "125/78 mmHg",
+      "BMI": "26.8"
+    },
+    "emergency_contact": {
+      "name": "Carol Brown",
+      "relation": "Daughter",
+      "phone": "+1-555-0502"
+    },
+    "address": "309 Oakridge Drive, Columbus, OH 43215",
+    "ssn_last4": "9043"
+  },
+  "P013": {
+    "name": "Johnny Smith",
+    "age": 37,
+    "gender": "Male",
+    "contact": "+1-555-1301",
+    "email": "johnny.smith@email.com",
+    "blood_type": "O+",
+    "conditions": [
+      "Nephrolithiasis (Kidney Stones)",
+      "Vitamin D Deficiency"
+    ],
+    "medications": [
+      "Tamsulosin 0.4mg",
+      "Cholecalciferol (Vitamin D3) 2000 IU"
+    ],
+    "last_visit": "2025-01-07",
+    "next_appointment": "2025-04-07",
+    "allergies": [
+      "None known"
+    ],
+    "doctor": "Dr. Mehta (Nephrologist)",
+    "visit_history": [
+      {
+        "date": "2025-01-07",
+        "reason": "Kidney stone follow-up",
+        "notes": "CT confirmed a 4mm left ureteral stone. Started on tamsulosin for medical expulsive therapy."
+      }
+    ],
+    "lab_results": {
+      "creatinine": "0.78 mg/dL",
+      "eGFR": "88 mL/min/1.73m2",
+      "vitamin_D": "18 ng/mL (low)"
+    },
+    "emergency_contact": {
+      "name": "Anna Smith",
+      "relation": "Sister",
+      "phone": "+1-555-1302"
+    },
+    "_note": "Structured profile added post-import; the source lab PDF for this patient (Johnny_lab_report.pdf) contains clinical content identical to another patient's report and is flagged with a caveat by the ingestion pipeline -- do not treat that PDF's findings as authoritative for this patient.",
+    "dob": "1989-03-15",
+    "address": "76 Pinehurst Ave, Springfield, IL 62704",
+    "ssn_last4": "3187"
+  },
+  "DOC-RebecaNagle": {
+    "name": "Rebeca Nagle",
+    "age": 40,
+    "gender": "Female",
+    "contact": "+1-541-950-0000",
+    "email": "",
+    "blood_type": "Unknown",
+    "conditions": [
+      "Polycystic Ovary Syndrome (PCOS)",
+      "History of Costochondritis"
+    ],
+    "medications": [
+      "Magnesium 300mg",
+      "Vitamin B2 (Riboflavin) 100mg",
+      "Combined Oral Contraceptive (COC)"
+    ],
+    "last_visit": "2022-09-20",
+    "next_appointment": "2023-09-20",
+    "allergies": [
+      "None known"
+    ],
+    "doctor": "Megana Lanoi, DNP (Family Medicine)",
+    "visit_history": [
+      {
+        "date": "2022-09-20",
+        "reason": "Sharp chest pain evaluation",
+        "notes": "Reproducible tenderness at right 5th costosternal joint. Diagnosed costochondritis; ibuprofen prescribed, cardiac/pulmonary causes ruled out on exam."
+      },
+      {
+        "date": "2022-09-07",
+        "reason": "Well woman annual exam",
+        "notes": "Screening labs and Pap smear obtained. COC refilled. Flu shot administered."
+      }
+    ],
+    "lab_results": {
+      "TSH": "1.88 mIU/L",
+      "triglycerides": "190 mg/dL",
+      "eGFR": "85 mL/min/1.73m2"
+    },
+    "emergency_contact": {
+      "name": "Not on file",
+      "relation": "Unknown",
+      "phone": ""
+    },
+    "documents": [
+      {
+        "filename": "sample_patient.pdf",
+        "type": "uploaded_document"
+      }
+    ],
+    "_note": "Original source note also mentioned recurring migraines; that condition was reassigned to avoid duplicating another patient's ailment in this dataset (see Priya Patel, P004). Source document (sample_patient.pdf) is unedited and remains available in patient history.",
+    "dob": "1986-05-19",
+    "address": "1220 SW Cascade Ave, Bend, OR 97702",
+    "ssn_last4": "6650"
+  },
+  "DOC-AnjaliMehra": {
+    "name": "Anjali Mehra",
+    "age": 35,
+    "gender": "Female",
+    "contact": "+91-98180-11245",
+    "email": "",
+    "blood_type": "Unknown",
+    "conditions": [
+      "Upper Respiratory Infection (resolved)",
+      "Seasonal Allergic Rhinitis"
+    ],
+    "medications": [
+      "Antihistamine (as needed)",
+      "Paracetamol (as needed)"
+    ],
+    "last_visit": "2024-03-15",
+    "next_appointment": "2024-09-15",
+    "allergies": [
+      "None known"
+    ],
+    "doctor": "Attending Physician, Pune Clinic",
+    "visit_history": [
+      {
+        "date": "2024-03-15",
+        "reason": "5-day dry cough and mild fever",
+        "notes": "Mild pharyngeal erythema, chest clear. Diagnosed URI (ICD-10 J06.9); symptomatic management advised, follow-up in 5 days if no improvement."
+      }
+    ],
+    "lab_results": {
+      "blood_pressure": "118/76 mmHg",
+      "temperature": "100.2 F",
+      "pulse": "96 bpm"
+    },
+    "emergency_contact": {
+      "name": "Not on file",
+      "relation": "Unknown",
+      "phone": ""
+    },
+    "documents": [
+      {
+        "filename": "sample_report_anjali.pdf",
+        "type": "uploaded_document"
+      }
+    ],
+    "dob": "1990-08-25",
+    "address": "202 Lakeview Apartments, Pune, Maharashtra 411001",
+    "ssn_last4": "1198"
+  },
+  "DOC-DavidThompso": {
+    "name": "David Thompson",
+    "age": 54,
+    "gender": "Male",
+    "contact": "+91-98450-11223",
+    "email": "",
+    "blood_type": "Unknown",
+    "conditions": [
+      "Metabolic Syndrome",
+      "Peripheral Neuropathy (mild)"
+    ],
+    "medications": [
+      "Metformin 1000mg BID",
+      "Atorvastatin 20mg"
+    ],
+    "last_visit": "2024-01-10",
+    "next_appointment": "2024-04-10",
+    "allergies": [
+      "None known"
+    ],
+    "doctor": "Attending Physician, Bangalore Clinic",
+    "visit_history": [
+      {
+        "date": "2024-01-10",
+        "reason": "Follow-up: increased thirst and urination",
+        "notes": "BP 140/88. Metformin increased to 1000mg BID. HbA1c and lipid profile ordered. Nutritionist follow-up scheduled."
+      }
+    ],
+    "lab_results": {
+      "blood_pressure": "140/88 mmHg",
+      "pulse": "82 bpm"
+    },
+    "emergency_contact": {
+      "name": "Not on file",
+      "relation": "Unknown",
+      "phone": ""
+    },
+    "documents": [
+      {
+        "filename": "sample_report_david.pdf",
+        "type": "uploaded_document"
+      }
+    ],
+    "_note": "Original source note diagnosed Type 2 Diabetes Mellitus; the structured condition here was reassigned to Metabolic Syndrome to avoid duplicating another patient's ailment in this dataset (see John Smith, P001). Source document (sample_report_david.pdf) is unedited and remains available in patient history.",
+    "dob": "1972-03-14",
+    "address": "88 MG Road, Bangalore, Karnataka 560001",
+    "ssn_last4": "8425"
+  },
+  "P006": {
+    "name": "Fatima Al-Sayed",
+    "age": 52,
+    "gender": "Female",
+    "contact": "+1-555-0601",
+    "email": "fatima.alsayed@email.com",
+    "blood_type": "B-",
+    "conditions": [
+      "Rheumatoid Arthritis",
+      "Osteoporosis"
+    ],
+    "medications": [
+      "Methotrexate 15mg weekly",
+      "Folic Acid 1mg",
+      "Alendronate 70mg weekly"
+    ],
+    "last_visit": "2025-01-15",
+    "next_appointment": "2025-04-15",
+    "allergies": [
+      "Sulfa drugs"
+    ],
+    "doctor": "Dr. Iyer (Rheumatologist)",
+    "visit_history": [
+      {
+        "date": "2025-01-15",
+        "reason": "RA flare, morning stiffness",
+        "notes": "Bilateral MCP/PIP joint swelling. Increased methotrexate dose. DEXA scan ordered given long-term steroid history."
+      },
+      {
+        "date": "2024-10-02",
+        "reason": "Bone density follow-up",
+        "notes": "T-score -2.7 at lumbar spine. Started alendronate."
+      }
+    ],
+    "lab_results": {
+      "CRP": "18 mg/L",
+      "RF": "Positive",
+      "anti_CCP": "Positive",
+      "T_score_lumbar": "-2.7"
+    },
+    "emergency_contact": {
+      "name": "Omar Al-Sayed",
+      "relation": "Husband",
+      "phone": "+1-555-0602"
+    },
+    "address": "33 Sycamore St, Dearborn, MI 48126",
+    "ssn_last4": "4409"
+  },
+  "P007": {
+    "name": "Daniel Kim",
+    "age": 29,
+    "gender": "Male",
+    "contact": "+1-555-0701",
+    "email": "daniel.kim@email.com",
+    "blood_type": "A+",
+    "conditions": [
+      "Epilepsy (well-controlled)",
+      "Restless Leg Syndrome"
+    ],
+    "medications": [
+      "Levetiracetam 500mg BID",
+      "Pramipexole 0.125mg (nightly)"
+    ],
+    "last_visit": "2025-02-05",
+    "next_appointment": "2025-08-05",
+    "allergies": [
+      "None known"
+    ],
+    "doctor": "Dr. Alvarez (Neurologist)",
+    "visit_history": [
+      {
+        "date": "2025-02-05",
+        "reason": "Routine epilepsy follow-up",
+        "notes": "Seizure-free for 18 months. Levetiracetam levels therapeutic. Continue current dose."
+      },
+      {
+        "date": "2024-08-12",
+        "reason": "Sleep disturbance evaluation",
+        "notes": "Reports urge to move legs at night, worse in evening. Started low-dose pramipexole."
+      }
+    ],
+    "lab_results": {
+      "ferritin": "45 ng/mL",
+      "levetiracetam_level": "Therapeutic"
+    },
+    "emergency_contact": {
+      "name": "Grace Kim",
+      "relation": "Mother",
+      "phone": "+1-555-0702"
+    },
+    "address": "501 Elm Street, Fullerton, CA 92831",
+    "ssn_last4": "7762"
+  },
+  "P008": {
+    "name": "Grace Mwangi",
+    "age": 41,
+    "gender": "Female",
+    "contact": "+1-555-0801",
+    "email": "grace.mwangi@email.com",
+    "blood_type": "O+",
+    "conditions": [
+      "Psoriasis",
+      "Vitamin B12 Deficiency"
+    ],
+    "medications": [
+      "Topical Calcipotriene",
+      "Vitamin B12 (Cyanocobalamin) 1000mcg injection monthly"
+    ],
+    "last_visit": "2025-01-28",
+    "next_appointment": "2025-04-28",
+    "allergies": [
+      "Iodine contrast"
+    ],
+    "doctor": "Dr. Osei (Dermatologist)",
+    "visit_history": [
+      {
+        "date": "2025-01-28",
+        "reason": "Plaque flare on elbows and scalp",
+        "notes": "PASI score improved with topical therapy. Continue calcipotriene, review for biologic if flares continue."
+      },
+      {
+        "date": "2024-09-19",
+        "reason": "Fatigue and tingling in hands",
+        "notes": "B12 level low at 145 pg/mL. Started monthly B12 injections."
+      }
+    ],
+    "lab_results": {
+      "vitamin_B12": "145 pg/mL (low, pre-treatment)",
+      "PASI_score": "6.2 (mild-moderate)"
+    },
+    "emergency_contact": {
+      "name": "Peter Mwangi",
+      "relation": "Husband",
+      "phone": "+1-555-0802"
+    },
+    "address": "19 Baldwin Ave, Minneapolis, MN 55407",
+    "ssn_last4": "3305"
+  },
+  "P009": {
+    "name": "Carlos Mendoza",
+    "age": 47,
+    "gender": "Male",
+    "contact": "+1-555-0901",
+    "email": "carlos.mendoza@email.com",
+    "blood_type": "AB-",
+    "conditions": [
+      "Irritable Bowel Syndrome (IBS)",
+      "GERD (Gastroesophageal Reflux Disease)"
+    ],
+    "medications": [
+      "Omeprazole 20mg",
+      "Dicyclomine 20mg (as needed)"
+    ],
+    "last_visit": "2025-02-12",
+    "next_appointment": "2025-05-12",
+    "allergies": [
+      "Shellfish"
+    ],
+    "doctor": "Dr. Castillo (Gastroenterologist)",
+    "visit_history": [
+      {
+        "date": "2025-02-12",
+        "reason": "Abdominal cramping and bloating",
+        "notes": "Symptoms consistent with IBS-mixed subtype. Low-FODMAP diet counseling given. Dicyclomine prescribed PRN."
+      },
+      {
+        "date": "2024-11-03",
+        "reason": "Heartburn, worse lying down",
+        "notes": "Started omeprazole. Advised weight management and avoiding late meals."
+      }
+    ],
+    "lab_results": {
+      "H_pylori": "Negative",
+      "celiac_panel": "Negative"
+    },
+    "emergency_contact": {
+      "name": "Sofia Mendoza",
+      "relation": "Wife",
+      "phone": "+1-555-0902"
+    },
+    "address": "764 Sunset Blvd, El Paso, TX 79901",
+    "ssn_last4": "9981"
+  },
+  "P010": {
+    "name": "Emily Chen",
+    "age": 27,
+    "gender": "Female",
+    "contact": "+1-555-1001",
+    "email": "emily.chen@email.com",
+    "blood_type": "A-",
+    "conditions": [
+      "Bipolar II Disorder",
+      "Chronic Insomnia"
+    ],
+    "medications": [
+      "Lamotrigine 100mg",
+      "Trazodone 50mg (nightly, as needed)"
+    ],
+    "last_visit": "2025-01-30",
+    "next_appointment": "2025-04-30",
+    "allergies": [
+      "Penicillin"
+    ],
+    "doctor": "Dr. Whitfield (Psychiatrist)",
+    "visit_history": [
+      {
+        "date": "2025-01-30",
+        "reason": "Mood stability check-in",
+        "notes": "Mood stable on current lamotrigine dose, no hypomanic episodes reported in 3 months. Continue current regimen."
+      },
+      {
+        "date": "2024-10-22",
+        "reason": "Difficulty falling and staying asleep",
+        "notes": "Sleep hygiene counseling provided. Started low-dose trazodone PRN."
+      }
+    ],
+    "lab_results": {
+      "lamotrigine_level": "Therapeutic",
+      "TSH": "1.9 mIU/L"
+    },
+    "emergency_contact": {
+      "name": "Wei Chen",
+      "relation": "Father",
+      "phone": "+1-555-1002"
+    },
+    "address": "12 Willowbrook Lane, Seattle, WA 98104",
+    "ssn_last4": "2247"
+  }
+}
