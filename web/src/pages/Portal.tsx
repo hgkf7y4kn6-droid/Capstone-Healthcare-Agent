@@ -179,7 +179,7 @@ export function Portal() {
               </div>
             );
           })}
-          {busy && <div className="flex gap-1.5 px-2 py-3" aria-label="Tendwell AA is replying">{[0, 1, 2].map((d) => <span key={d} className="size-2 animate-bounce rounded-full bg-ink-soft" style={{ animationDelay: `${d * 120}ms` }} />)}</div>}
+          {busy && <div className="flex gap-1.5 px-2 py-3" aria-label="AegisTriage is replying">{[0, 1, 2].map((d) => <span key={d} className="size-2 animate-bounce rounded-full bg-ink-soft" style={{ animationDelay: `${d * 120}ms` }} />)}</div>}
           {error && <ErrorNote message={error} />}
           <div ref={endRef} className="scroll-mb-44" />
         </div>
@@ -187,7 +187,7 @@ export function Portal() {
 
       <div className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
         <form onSubmit={(e) => ask(text, e)} className="mx-auto flex max-w-[720px] gap-2 px-4 pt-3">
-          <label className="sr-only" htmlFor="ask">Message Tendwell AA</label>
+          <label className="sr-only" htmlFor="ask">Message AegisTriage</label>
           <input id="ask" className="field rounded-full px-5 shadow-[0_6px_24px_-12px_rgb(15_42_34/0.35)]" placeholder="Ask about a visit, refill or condition" value={text} onChange={(e) => setText(e.target.value)} autoComplete="off" maxLength={2000} />
           <button className="btn btn-primary shrink-0 px-4" disabled={busy || !text.trim()} aria-label="Send"><Send size={18} /></button>
         </form>

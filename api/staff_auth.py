@@ -25,8 +25,8 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 import config
 
-ISSUER = "tendwell"
-AUDIENCE = "tendwell-staff"
+ISSUER = "aegistriage"
+AUDIENCE = "aegistriage-staff"
 _bearer = HTTPBearer(auto_error=False)
 
 _FAILED_WINDOW_S = 15 * 60

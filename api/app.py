@@ -1,5 +1,5 @@
 """
-Tendwell AA product API — the one server behind the web app.
+AegisTriage product API — the one server behind the web app.
 
     uvicorn api.app:app --reload --port 8000
 
@@ -217,7 +217,7 @@ def staff_overview(staff: dict = Depends(staff_auth.require_staff)):
         "checklist": {
             "calendar_connected": bool(config.CALCOM_API_KEY),
             "portal_connected": bool(config.PORTAL_WEBHOOK_URL),
-            "own_access_code": config.STAFF_ACCESS_CODE not in ("", "tendwell-demo"),
+            "own_access_code": config.STAFF_ACCESS_CODE not in ("", "aegistriage-demo"),
             "patients_loaded": len(patients) > 0,
         },
     }
@@ -480,7 +480,7 @@ def staff_quality_check(staff: dict = Depends(staff_auth.require_staff)):
     import json as _json
     import subprocess
     import tempfile
-    with tempfile.TemporaryDirectory(prefix="tendwell_eval_") as tmp:
+    with tempfile.TemporaryDirectory(prefix="aegistriage_eval_") as tmp:
         env = {**os.environ, "PATIENT_DB_PATH": os.path.join(tmp, "eval.db"), "LOGS_DIR": tmp,
                "DEMO_MODE": "false"}
         code = ("import json; from data import patient_db as db; db.init_db(seed=False); "

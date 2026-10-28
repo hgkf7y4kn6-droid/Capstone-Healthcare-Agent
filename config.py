@@ -1,5 +1,5 @@
 """
-Central configuration for Tendwell AA (the agentic healthcare assistant).
+Central configuration for AegisTriage (the agentic healthcare assistant).
 
 All secrets are read from environment variables. NEVER hardcode API keys
 in this file or anywhere else in the codebase.
@@ -24,7 +24,7 @@ except ImportError:  # dotenv is a convenience, never a hard requirement
     pass
 
 # ---- Product ----
-APP_NAME = os.getenv("APP_NAME", "Tendwell AA")
+APP_NAME = os.getenv("APP_NAME", "AegisTriage")
 APP_ENV = os.getenv("APP_ENV", "development")  # development | staging | production
 CLINIC_NAME = os.getenv("CLINIC_NAME", "Horsham Family Health")
 CLINIC_PHONE = os.getenv("CLINIC_PHONE", "(215) 555-0142")
@@ -42,7 +42,7 @@ LOCAL_LLM_MAX_NEW_TOKENS = int(os.getenv("LOCAL_LLM_MAX_NEW_TOKENS", "512"))
 #   auto      -> CrewAI + local model when installed, otherwise the deterministic concierge
 #   crew      -> always CrewAI (errors surface if it's unavailable)
 #   concierge -> always the deterministic concierge (fast, free, predictable — good for hosting)
-ASSISTANT_ENGINE = os.getenv("ASSISTANT_ENGINE", "auto").lower()
+ASSISTANT_ENGINE = os.getenv("ASSISTANT_ENGINE", "auto" if APP_ENV == "development" else "concierge").lower()
 
 # ---- Integrations ----
 CALCOM_API_KEY = os.getenv("CALCOM_API_KEY", "")
@@ -65,7 +65,7 @@ PORTAL_WEBHOOK_SECRET = os.getenv("PORTAL_WEBHOOK_SECRET", "")
 # In development both fall back to demo values so the app runs out of the box;
 # production refuses to start staff sign-in without them (see api/staff_auth.py).
 SESSION_SECRET = os.getenv("SESSION_SECRET", "" if APP_ENV == "production" else _DEV_ONLY)
-STAFF_ACCESS_CODE = os.getenv("STAFF_ACCESS_CODE", "" if APP_ENV == "production" else "tendwell-demo")
+STAFF_ACCESS_CODE = os.getenv("STAFF_ACCESS_CODE", "" if APP_ENV == "production" else "aegistriage-demo")
 SESSION_TTL_HOURS = int(os.getenv("SESSION_TTL_HOURS", "12"))
 CORS_ORIGINS = [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",") if o.strip()]
 

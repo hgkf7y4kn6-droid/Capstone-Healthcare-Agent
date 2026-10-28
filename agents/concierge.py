@@ -1,5 +1,5 @@
 """
-The deterministic concierge — Tendwell AA's patient assistant when CrewAI or
+The deterministic concierge — AegisTriage's patient assistant when CrewAI or
 the local model isn't available (or when ASSISTANT_ENGINE=concierge, the
 recommended setting for hosted deployments).
 

@@ -24,7 +24,7 @@ function NotFound() {
       <div>
         <p className="font-display text-[44px]">This page isn't here.</p>
         <p className="mt-2 text-ink-soft">The link may be old. Head back to the start.</p>
-        <Link to="/" className="btn btn-primary mt-6">Go to Tendwell AA</Link>
+        <Link to="/" className="btn btn-primary mt-6">Go to AegisTriage</Link>
       </div>
     </div>
   );

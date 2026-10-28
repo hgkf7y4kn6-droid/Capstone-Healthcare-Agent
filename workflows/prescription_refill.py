@@ -13,15 +13,13 @@ Implements the end-to-end workflow:
         [Write to EHR eRx Queue & Notify Pharmacy]                          [Route to Provider Chart for 1-Click Action]
 
 This module is transport-agnostic: it's called directly by the conversational
-agent (tools/prescription_tool.py) and by the FastAPI webhook
-(api/webhook_server.py), so both entry points share one rule engine instead
-of duplicating clinical logic.
+agent (tools/prescription_tool.py) and by the product API (api/app.py), so
+both entry points share one rule engine instead of duplicating clinical logic.
 
 DATA NOTE: this operates against the local SQLite EHR (data/patient_db.py),
 not a live hospital FHIR server — there's no real EHR to connect to in this
-environment. The FHIR/httpx integration point is documented in
-api/webhook_server.py for wiring up a real system later; the rule engine
-logic here is what actually matters and is identical either way.
+environment. The rule engine logic here is what actually matters and is identical
+whichever EHR sits behind it.
 
 SAFETY NOTE: this is a demo/capstone-grade identity check (patient ID + DOB
 match) and rule engine, not a certified clinical decision support system or

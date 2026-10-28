@@ -82,7 +82,7 @@ def run_scenario(scenario: dict) -> dict:
     print(f"Query: {scenario['query']}")
     start = time.perf_counter()
     try:
-        result = run_assistant(scenario["query"])
+        result = run_assistant(scenario["query"], audience="staff")
     except Exception as e:
         elapsed = time.perf_counter() - start
         print(f"CRASHED after {elapsed:.1f}s: {e}")

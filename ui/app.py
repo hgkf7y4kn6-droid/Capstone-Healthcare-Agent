@@ -24,7 +24,7 @@ from monitoring.monitor import summarize_latency, throughput_over_time
 from workflows.prescription_refill import process_refill_request
 from evaluation.feedback_evaluator import run_feedback_eval_suite, summarize_feedback_eval
 
-st.set_page_config(page_title="Tendwell AA ops console", layout="wide")
+st.set_page_config(page_title="AegisTriage ops console", layout="wide")
 
 
 @st.cache_resource
@@ -42,7 +42,7 @@ def _init_db_once():
 
 _init_db_once()
 
-st.title("Tendwell AA ops console")
+st.title("AegisTriage ops console")
 st.caption("Internal engineering view: agent traces, evaluation suites and raw queues. "
            "Clinic staff use the web console (uvicorn api.app:app) instead.")
 st.caption("💡 Runs on a free local LLM (no API key) — the assistant tabs below load the model on first use.")
@@ -102,7 +102,7 @@ with tab_chat:
         with st.chat_message("assistant"):
             with st.spinner("Planning and executing..."):
                 try:
-                    result = run_assistant(user_query, patient_id_hint=patient_id_hint)
+                    result = run_assistant(user_query, patient_id_hint=patient_id_hint, audience="staff")
                     response_text = result.get("final_response") or "(No response generated.)"
                     st.write(response_text)
 

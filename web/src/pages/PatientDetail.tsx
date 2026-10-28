@@ -245,7 +245,7 @@ function PhoneRefill({ rx, onClose }: { rx: Rx; onClose: () => void }) {
   return (
     <div className="panel settle mt-4 p-5">
       <h3 className="text-[18px] font-bold">Refill {rx.name} by phone</h3>
-      <p className="text-ink-soft">Ask the caller to confirm who they are. Tendwell AA checks it against the record, then runs the same rules as an online request.</p>
+      <p className="text-ink-soft">Ask the caller to confirm who they are. AegisTriage checks it against the record, then runs the same rules as an online request.</p>
       {result ? (
         <div className={`lane lane-${lane} mt-4`}>
           <p className="font-semibold">{result.message}</p>

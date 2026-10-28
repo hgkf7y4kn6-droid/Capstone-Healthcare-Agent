@@ -1,7 +1,7 @@
 """
 Mutual TLS (mTLS) configuration reference for production deployment.
 
-NOT wired into api/webhook_server.py by default — mTLS needs real
+NOT wired into api/app.py by default — mTLS needs real
 certificates (a CA cert, a server cert/key, and the portal's client cert)
 that don't exist in this environment, so this is documentation plus a ready
 -to-use config function, not something you can exercise here.
@@ -25,7 +25,7 @@ Usage (once you have real certs):
     import uvicorn
 
     uvicorn.run(
-        "api.webhook_server:app",
+        "api.app:app",
         host="0.0.0.0", port=8443,
         **uvicorn_mtls_kwargs(
             certfile="/etc/certs/server.crt",

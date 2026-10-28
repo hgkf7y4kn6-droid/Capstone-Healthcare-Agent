@@ -153,6 +153,6 @@ def is_emergency(text: str) -> bool:
 
 
 DISCLAIMER = (
-    "Tendwell AA gives general information and helps with scheduling and refills. "
+    "AegisTriage gives general information and helps with scheduling and refills. "
     "It isn't a doctor and can't diagnose. In an emergency, call 911."
 )

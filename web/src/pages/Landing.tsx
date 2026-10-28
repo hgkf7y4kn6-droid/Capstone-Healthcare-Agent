@@ -23,7 +23,7 @@ const STEPS = [
   },
   {
     title: "The assistant only explains",
-    body: "Language comes last. Tendwell AA tells the patient what happened in plain words, cites MedlinePlus for health information, and never invents a diagnosis.",
+    body: "Language comes last. AegisTriage tells the patient what happened in plain words, cites MedlinePlus for health information, and never invents a diagnosis.",
   },
 ];
 
@@ -53,7 +53,7 @@ export function Landing() {
               The front desk that never closes.
             </h1>
             <p className="mt-6 max-w-[46ch] text-[19px] leading-relaxed text-ink-soft">
-              Tendwell AA answers patients, routes refills through your safety rules and takes booking requests all night.
+              AegisTriage answers patients, routes refills through your safety rules and takes booking requests all night.
               Clear-cut requests finish on their own. Everything else is waiting for the right person in the morning,
               chart already open.
             </p>
@@ -65,7 +65,7 @@ export function Landing() {
           </div>
 
           {/* The one orchestrated moment: last night's messages route into their lanes. */}
-          <figure className="hero p-5 sm:p-7" aria-label="Example: four overnight messages and where Tendwell AA routed them">
+          <figure className="hero p-5 sm:p-7" aria-label="Example: four overnight messages and where AegisTriage routed them">
             <div className="flex items-baseline justify-between gap-3">
               <p className="font-display text-[22px]">While the clinic was closed</p>
               <p className="text-sm text-hero-soft">9:40 pm to 7:00 am</p>
@@ -87,7 +87,7 @@ export function Landing() {
 
         <section id="how" className="border-y border-line bg-surface">
           <div className="mx-auto max-w-[1180px] px-5 py-16 sm:px-8 lg:py-20">
-            <h2 className="max-w-[22ch] font-display text-[36px] leading-tight font-medium sm:text-[44px]">How Tendwell AA decides what to do</h2>
+            <h2 className="max-w-[22ch] font-display text-[36px] leading-tight font-medium sm:text-[44px]">How AegisTriage decides what to do</h2>
             <p className="mt-3 max-w-[60ch] text-ink-soft">
               The order matters. Safety and clinical rules run before any language model sees a message, so the answer
               to “should this refill go out?” is always the same, and always one your providers can read.
@@ -146,7 +146,7 @@ export function Landing() {
                   </ul>
                   <div className="mt-auto pt-7">
                     {p.name === "Network" ? (
-                      <a href="mailto:hello@richesdigitalventures.com?subject=Tendwell AA%20AA%20Network" className={`btn w-full ${p.featured ? "btn-primary" : "border border-white/25 hover:bg-white/10"}`}>Talk to us</a>
+                      <a href="mailto:hello@richesdigitalventures.com?subject=AegisTriage%20AA%20Network" className={`btn w-full ${p.featured ? "btn-primary" : "border border-white/25 hover:bg-white/10"}`}>Talk to us</a>
                     ) : (
                       <Link to="/sign-in?demo=1" className={`btn w-full ${p.featured ? "btn-primary" : "border border-white/25 hover:bg-white/10"}`}>Try it with demo patients</Link>
                     )}
@@ -161,7 +161,7 @@ export function Landing() {
           <h2 className="font-display text-[30px] font-medium">Good to know</h2>
           <dl className="mt-6 grid gap-6 md:grid-cols-3">
             <div><dt className="font-bold">It doesn't diagnose</dt><dd className="mt-1 text-ink-soft">Health information comes from MedlinePlus, and the assistant says so. Clinical judgment stays with your team.</dd></div>
-            <div><dt className="font-bold">Providers make the hard calls</dt><dd className="mt-1 text-ink-soft">Anything a rule can't clear goes to a person. Tendwell AA gathers the context; it never overrides a no.</dd></div>
+            <div><dt className="font-bold">Providers make the hard calls</dt><dd className="mt-1 text-ink-soft">Anything a rule can't clear goes to a person. AegisTriage gathers the context; it never overrides a no.</dd></div>
             <div><dt className="font-bold">It runs without the cloud AI bill</dt><dd className="mt-1 text-ink-soft">The rules-first concierge needs no language model at all, and the full agent runs on a model you host.</dd></div>
           </dl>
         </section>

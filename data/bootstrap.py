@@ -1,5 +1,5 @@
 """
-First-start setup for a Tendwell AA server.
+First-start setup for a AegisTriage server.
 
 `ensure_ready()` creates the schema, and in DEMO_MODE (never with real
 patient data) loads the synthetic roster and runs a handful of real requests

@@ -13,7 +13,7 @@ export function Brand({ inverted = false }: { inverted?: boolean }) {
     <span className="inline-flex items-center gap-2.5">
       <Mark size={30} className={inverted ? "rounded-[9px] ring-1 ring-hero-soft/40" : ""} />
       <span className={`flex items-baseline gap-1.5 font-display text-[22px] leading-none font-semibold tracking-tight ${inverted ? "text-on-hero" : "text-ink"}`}>
-        Tendwell
+        AegisTriage
         <abbr title="Administrative Assistant" className="rounded-full bg-ceil px-1.5 py-0.5 font-sans text-[12px] font-bold tracking-wide text-ceil-ink no-underline">AA</abbr>
       </span>
     </span>

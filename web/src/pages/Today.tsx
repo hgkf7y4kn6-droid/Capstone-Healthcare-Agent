@@ -86,7 +86,7 @@ export function Today() {
 
         <div className="space-y-10">
           {o && <StartHere checklist={o.checklist} />}
-          <Section title="What Tendwell AA did">
+          <Section title="What AegisTriage did">
             {activity.loading && !activity.data ? <Skeleton rows={4} /> : activity.data?.length ? (
               <ol className="space-y-3">
                 {activity.data.map((a, i) => (

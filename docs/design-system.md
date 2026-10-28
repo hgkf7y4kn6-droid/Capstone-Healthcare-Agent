@@ -1,6 +1,6 @@
 # Design system: "Scrubs & Ceil"
 
-Tendwell AA's look is its own. It's drawn from the clinic floor — hunter-green and ceil-blue scrubs, triage tags, the paper day sheet at the front desk — and borrows proven ideas from the sibling projects:
+AegisTriage's look is its own. It's drawn from the clinic floor — hunter-green and ceil-blue scrubs, triage tags, the paper day sheet at the front desk — and borrows proven ideas from the sibling projects:
 
 - **Mindful Money Management:** a palette tied to the logo, a branded sign-in, a time-of-day greeting, one summary hero per screen and inviting empty states.
 - **DFS Riches:** the inverted hero panel with stat tiles, a "Start here" checklist for first-run setup, and tinted status chips.
@@ -18,7 +18,7 @@ Sources of truth:
 
 ## The signature: lanes
 
-Everything Tendwell AA does ends in a **lane** — where a request was routed. Lanes are shown as a 4px colored rule on the leading edge of a row, like the colored band on a triage tag. Lanes are the one bold device; everything around them stays quiet.
+Everything AegisTriage does ends in a **lane** — where a request was routed. Lanes are shown as a 4px colored rule on the leading edge of a row, like the colored band on a triage tag. Lanes are the one bold device; everything around them stays quiet.
 
 | Lane | Meaning | Token |
 |---|---|---|
@@ -63,4 +63,4 @@ One orchestrated moment per surface: the landing page routes four sample message
 
 ## Voice
 
-Plain verbs, sentence case, the person's own words for things ("Request a refill", not "Submit refill"). An action keeps its name through the flow ("Approve" → "Approved"). Errors say what happened and what to do next. Empty states say what will appear and offer the action that creates it. Tendwell AA never claims to diagnose and always keeps 911 one tap away for patients.
+Plain verbs, sentence case, the person's own words for things ("Request a refill", not "Submit refill"). An action keeps its name through the flow ("Approve" → "Approved"). Errors say what happened and what to do next. Empty states say what will appear and offer the action that creates it. AegisTriage never claims to diagnose and always keeps 911 one tap away for patients.

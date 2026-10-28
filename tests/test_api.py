@@ -22,7 +22,7 @@ class ProductApiTests(IsolatedDBTestCase):
     def setUp(self):
         super().setUp()
         self.client = TestClient(app)  # no context manager: skips demo seeding on startup
-        token = self.client.post("/api/auth/staff", json={"code": "tendwell-demo", "name": "Test"}).json()["token"]
+        token = self.client.post("/api/auth/staff", json={"code": "aegistriage-demo", "name": "Test"}).json()["token"]
         self.staff = {"Authorization": f"Bearer {token}"}
         self.alice = self.make_patient(name="Alice Avery", dob="1970-02-02", ssn_last4="1234", external_id="A1")
         self.bob = self.make_patient(name="Bob Brook", dob="1980-03-03", external_id="B1")

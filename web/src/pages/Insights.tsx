@@ -82,7 +82,7 @@ export function InsightsPage() {
 
   return (
     <div className="space-y-10">
-      <PageHeader title="Insights" lead="How much Tendwell AA handled on its own, where it asked for a person, and how fast each part responds." />
+      <PageHeader title="Insights" lead="How much AegisTriage handled on its own, where it asked for a person, and how fast each part responds." />
 
       <section className="hero grid gap-6 p-6 sm:grid-cols-3 sm:p-8" aria-label="Refill automation">
         <div className="sm:col-span-1">

@@ -1,9 +1,9 @@
 # Render Blueprint — one web service serves the API and the web app.
-# Point a subdomain (e.g. tendwell-aa.richesdigitalventures.com) at it in the
+# Point a subdomain (e.g. aegistriage.richesdigitalventures.com) at it in the
 # Render dashboard. Secrets marked sync:false are entered there, never here.
 services:
   - type: web
-    name: tendwell-aa
+    name: aegistriage
     runtime: docker
     plan: starter
     healthCheckPath: /api/health
@@ -32,6 +32,6 @@ services:
       - key: CALCOM_API_KEY
         sync: false
     disk:
-      name: tendwell-aa-data
+      name: aegistriage-data
       mountPath: /var/data
       sizeGB: 1
