@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Runtime data — generated on first start, never committed (contains PHI in real use)
+data/patients.db
+data/*.db-journal
+data/vector_store/
+logs/*.jsonl
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Web
+web/node_modules/
+web/dist/
+.DS_Store

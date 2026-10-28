@@ -24,7 +24,7 @@ from monitoring.monitor import summarize_latency, throughput_over_time
 from workflows.prescription_refill import process_refill_request
 from evaluation.feedback_evaluator import run_feedback_eval_suite, summarize_feedback_eval
 
-st.set_page_config(page_title="Agentic Healthcare Assistant", layout="wide")
+st.set_page_config(page_title="Tendwell ops console", layout="wide")
 
 
 @st.cache_resource
@@ -42,8 +42,9 @@ def _init_db_once():
 
 _init_db_once()
 
-st.title("🩺 Agentic Healthcare Assistant")
-st.caption("Agentic AI + RAG for appointment booking, medical records, and disease information")
+st.title("Tendwell ops console")
+st.caption("Internal engineering view: agent traces, evaluation suites and raw queues. "
+           "Clinic staff use the web console (uvicorn api.app:app) instead.")
 st.caption("💡 Runs on a free local LLM (no API key) — the assistant tabs below load the model on first use.")
 
 missing = require_keys("CALCOM_API_KEY")
@@ -146,7 +147,8 @@ with tab_patient:
     with col2:
         st.markdown("**All patients**")
         if patients:
-            st.dataframe(pd.DataFrame(patients), use_container_width=True)
+            st.dataframe(pd.DataFrame(patients).drop(columns=["ssn_last4", "address", "dob"], errors="ignore"),
+                         use_container_width=True)
         else:
             st.info("No patients yet.")
 
@@ -253,8 +255,8 @@ with tab_rx:
 
                 dob_input = st.text_input(
                     "Date of birth (identity verification, YYYY-MM-DD)",
-                    value=chosen_patient.get("dob", ""),
-                    help="Pre-filled with the DOB on file for this demo — try changing it to see the identity-check failure path.",
+                    value=chosen_patient.get("dob", "") if os.getenv("DEMO_MODE", "true").lower() in ("1", "true", "yes") else "",
+                    help="Pre-filled in demo mode only — try changing it to see the identity-check failure path.",
                 )
 
                 with st.expander("➕ Additional verification factors (optional)"):
@@ -265,11 +267,11 @@ with tab_rx:
                     address_input = st.text_input(
                         "Home address",
                         value="",
-                        help=f"On file: {chosen_patient.get('address', '(none on file)')}",
+                        help="Must match the address on file. (The console never displays it.)",
                     )
                     ssn_input = st.text_input(
                         "Last 4 digits of SSN", value="", max_chars=4,
-                        help=f"On file: {chosen_patient.get('ssn_last4', '(none on file)')}",
+                        help="Must match the digits on file. (The console never displays them.)",
                     )
 
                 pharmacy_id = st.text_input("Pharmacy ID", value="PHARM-001")

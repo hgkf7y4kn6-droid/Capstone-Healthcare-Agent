@@ -130,8 +130,19 @@ async def get_prescriptions(ctx: dict = Depends(_require_scope_dep("prescription
     return active
 
 
+def _rate_limited(func):
+    """slowapi needs the `request` argument on the endpoint and must wrap
+    the function BEFORE the router registers it (wrapping afterwards, as
+    this module used to, crashed at import whenever slowapi was installed)."""
+    if SLOWAPI_AVAILABLE and limiter is not None:
+        return limiter.limit("10/minute")(func)
+    return func
+
+
 @router.post("/refills", status_code=202, response_model=RefillAccepted)
+@_rate_limited
 async def submit_refill(
+    request: Request,
     payload: PortalRefillPayload,
     background_tasks: BackgroundTasks,
     ctx: dict = Depends(_require_scope_dep("refills:write")),
@@ -210,7 +221,19 @@ async def get_refill_status(tracking_id: str, ctx: dict = Depends(_require_scope
 # ---------------------------------------------------------------------------
 
 @router.websocket("/ws/refills/{patient_id}")
-async def refill_status_websocket(websocket: WebSocket, patient_id: int):
+async def refill_status_websocket(websocket: WebSocket, patient_id: int, token: str = ""):
+    """Live status for ONE patient. Browsers can't set headers on a
+    WebSocket, so the portal JWT comes as `?token=`; it must resolve to the
+    same patient_id or the socket is closed (previously anyone could listen
+    to any patient's refill updates)."""
+    try:
+        patient = resolve_patient(decode_portal_token(token))
+    except PortalAuthError:
+        await websocket.close(code=4401)
+        return
+    if patient["patient_id"] != patient_id:
+        await websocket.close(code=4403)
+        return
     await ws_manager.connect(patient_id, websocket)
     try:
         while True:
@@ -218,7 +241,3 @@ async def refill_status_websocket(websocket: WebSocket, patient_id: int):
     except WebSocketDisconnect:
         ws_manager.disconnect(patient_id, websocket)
 
-
-# Apply rate limiting to the mutating endpoint if slowapi is available.
-if SLOWAPI_AVAILABLE and limiter is not None:
-    submit_refill = limiter.limit("10/minute")(submit_refill)

@@ -1,0 +1,7 @@
+# The internal ops console (streamlit run ui/app.py) wears the Tendwell palette.
+[theme]
+primaryColor = "#1f5c48"
+backgroundColor = "#f3f6f4"
+secondaryBackgroundColor = "#e8eeeb"
+textColor = "#0f2a22"
+font = "sans serif"

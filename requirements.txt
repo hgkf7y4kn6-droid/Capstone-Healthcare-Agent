@@ -1,0 +1,11 @@
+# Core runtime — enough to host Tendwell (API + web console) with the
+# deterministic concierge. Everything AI-heavy lives in requirements-ai.txt.
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.7
+PyJWT>=2.8
+httpx>=0.27
+requests>=2.32
+python-dotenv>=1.0
+pypdf>=4.0
+slowapi>=0.1.9

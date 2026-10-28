@@ -1,0 +1,16 @@
+# Optional: the CrewAI agents on a local model, vector memory and the
+# Streamlit ops console. Install on a machine with the RAM/CPU (or GPU) for it:
+#   pip install -r requirements.txt -r requirements-ai.txt
+crewai>=0.80
+transformers>=4.44
+torch>=2.3
+huggingface_hub>=0.24
+langchain-core>=0.3
+langchain-community>=0.3
+langchain-huggingface>=0.1
+faiss-cpu>=1.8
+sentence-transformers>=3.0
+streamlit>=1.38
+pandas>=2.2
+celery[redis]>=5.4
+boto3>=1.34

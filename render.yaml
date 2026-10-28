@@ -1,0 +1,37 @@
+# Render Blueprint — one web service serves the API and the web app.
+# Point a subdomain (e.g. tendwell.richesdigitalventures.com) at it in the
+# Render dashboard. Secrets marked sync:false are entered there, never here.
+services:
+  - type: web
+    name: tendwell
+    runtime: docker
+    plan: starter
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEMO_MODE
+        value: "true"            # synthetic patients only — set to "false" before any real data
+      - key: ASSISTANT_ENGINE
+        value: concierge
+      - key: DATA_DIR
+        value: /var/data
+      - key: LOGS_DIR
+        value: /var/data/logs
+      - key: CLINIC_NAME
+        value: Horsham Family Health
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: PORTAL_JWT_SECRET
+        generateValue: true
+      - key: STAFF_ACCESS_CODE
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: CALCOM_API_KEY
+        sync: false
+    disk:
+      name: tendwell-data
+      mountPath: /var/data
+      sizeGB: 1

@@ -1,0 +1,245 @@
+@import "tailwindcss";
+@import "@fontsource/atkinson-hyperlegible-next/400.css";
+@import "@fontsource/atkinson-hyperlegible-next/600.css";
+@import "@fontsource/atkinson-hyperlegible-next/700.css";
+@import "@fontsource-variable/newsreader/opsz.css";
+@import "@fontsource-variable/newsreader/opsz-italic.css";
+
+/* Colors mirror src/tokens.ts (tests/tokens.test.mjs keeps them in sync). */
+:root {
+  --bg: #f3f6f4;
+  --surface: #ffffff;
+  --sunken: #e8eeeb;
+  --ink: #0f2a22;
+  --ink-soft: #4a5f57;
+  --line: #d3ddd8;
+  --primary: #1f5c48;
+  --on-primary: #ffffff;
+  --ceil: #b9c6ec;
+  --ceil-ink: #33447a;
+  --hero: #12392d;
+  --on-hero: #f3f6f4;
+  --hero-soft: #a9c4b9;
+  --hero-done: #79d8a6;
+  --hero-review: #f2b766;
+  --hero-schedule: #b9c6ec;
+  --hero-urgent: #ff8e84;
+  --done: #17613f;
+  --done-soft: #dcefe3;
+  --review: #8a4b00;
+  --review-soft: #f8ead6;
+  --schedule: #33447a;
+  --schedule-soft: #e3e8f8;
+  --urgent: #a8231c;
+  --urgent-soft: #f9e1df;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b1613;
+    --surface: #12201c;
+    --sunken: #0f1b18;
+    --ink: #e4eee9;
+    --ink-soft: #9db3aa;
+    --line: #23362f;
+    --primary: #7fd1ae;
+    --on-primary: #06231a;
+    --ceil: #2a3766;
+    --ceil-ink: #b9c6ec;
+    --hero: #102e25;
+    --on-hero: #e4eee9;
+    --hero-soft: #9fbdb1;
+    --hero-done: #79d8a6;
+    --hero-review: #f2b766;
+    --hero-schedule: #b9c6ec;
+    --hero-urgent: #ff8e84;
+    --done: #79d8a6;
+    --done-soft: #12301f;
+    --review: #f2b766;
+    --review-soft: #33260f;
+    --schedule: #b9c6ec;
+    --schedule-soft: #1f2a4d;
+    --urgent: #ff8e84;
+    --urgent-soft: #3a1714;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0b1613;
+  --surface: #12201c;
+  --sunken: #0f1b18;
+  --ink: #e4eee9;
+  --ink-soft: #9db3aa;
+  --line: #23362f;
+  --primary: #7fd1ae;
+  --on-primary: #06231a;
+  --ceil: #2a3766;
+  --ceil-ink: #b9c6ec;
+  --hero: #102e25;
+  --on-hero: #e4eee9;
+  --hero-soft: #9fbdb1;
+  --hero-done: #79d8a6;
+  --hero-review: #f2b766;
+  --hero-schedule: #b9c6ec;
+  --hero-urgent: #ff8e84;
+  --done: #79d8a6;
+  --done-soft: #12301f;
+  --review: #f2b766;
+  --review-soft: #33260f;
+  --schedule: #b9c6ec;
+  --schedule-soft: #1f2a4d;
+  --urgent: #ff8e84;
+  --urgent-soft: #3a1714;
+  color-scheme: dark;
+}
+
+@theme {
+  --font-display: "Newsreader Variable", Georgia, serif;
+  --font-sans: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --radius-row: 10px;
+  --radius-panel: 14px;
+  --radius-hero: 22px;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-ceil: var(--ceil);
+  --color-ceil-ink: var(--ceil-ink);
+  --color-hero: var(--hero);
+  --color-on-hero: var(--on-hero);
+  --color-hero-soft: var(--hero-soft);
+  --color-hero-done: var(--hero-done);
+  --color-hero-review: var(--hero-review);
+  --color-hero-schedule: var(--hero-schedule);
+  --color-hero-urgent: var(--hero-urgent);
+  --color-done: var(--done);
+  --color-done-soft: var(--done-soft);
+  --color-review: var(--review);
+  --color-review-soft: var(--review-soft);
+  --color-schedule: var(--schedule);
+  --color-schedule-soft: var(--schedule-soft);
+  --color-urgent: var(--urgent);
+  --color-urgent-soft: var(--urgent-soft);
+}
+
+html {
+  background: var(--bg);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  @apply bg-bg text-ink font-sans antialiased;
+  font-size: 16px;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+
+h1, h2, h3 {
+  text-wrap: balance;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ceil-ink);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: var(--ceil);
+  color: var(--ink);
+}
+
+/* ---------- Component vocabulary ---------- */
+
+@utility panel {
+  @apply rounded-panel border border-line bg-surface;
+}
+
+@utility hero {
+  @apply rounded-hero bg-hero text-on-hero;
+}
+
+@utility btn {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-[15px] font-semibold transition-[transform,background-color,opacity] duration-150 active:scale-[0.97] disabled:opacity-50 disabled:active:scale-100;
+}
+
+@utility btn-primary {
+  @apply bg-primary text-on-primary hover:brightness-110;
+}
+
+@utility btn-quiet {
+  @apply border border-line bg-surface text-ink hover:bg-sunken;
+}
+
+@utility btn-ghost {
+  @apply text-ink hover:bg-sunken;
+}
+
+@utility field {
+  @apply min-h-11 w-full rounded-row border border-line bg-surface px-3.5 text-ink placeholder:text-ink-soft focus:border-ceil-ink focus:outline-none focus:ring-3 focus:ring-ceil;
+}
+
+@utility chip {
+  @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[13px] font-semibold whitespace-nowrap;
+}
+
+/* Lanes: the colored leading edge on a routed item. */
+@utility lane {
+  @apply relative pl-4;
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 4px;
+    border-radius: 999px;
+    background: var(--lane, var(--line));
+  }
+}
+
+.lane-done { --lane: var(--done); }
+.lane-review { --lane: var(--review); }
+.lane-schedule { --lane: var(--schedule); }
+.lane-urgent { --lane: var(--urgent); }
+
+/* On the dark hero surface, lanes use their bright variants. */
+.hero .lane-done, .bg-hero .lane-done { --lane: var(--hero-done); }
+.hero .lane-review, .bg-hero .lane-review { --lane: var(--hero-review); }
+.hero .lane-schedule, .bg-hero .lane-schedule { --lane: var(--hero-schedule); }
+.hero .lane-urgent, .bg-hero .lane-urgent { --lane: var(--hero-urgent); }
+
+/* ---------- The one orchestrated moment (landing) ---------- */
+
+@keyframes route-in {
+  from { opacity: 0; transform: translateX(-28px); }
+  to { opacity: 1; transform: none; }
+}
+
+.route-in {
+  animation: route-in 620ms var(--ease-out-expo) both;
+}
+
+@keyframes settle {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.settle {
+  animation: settle 320ms var(--ease-out-expo) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
+}

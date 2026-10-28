@@ -1,0 +1,8 @@
+.git
+**/__pycache__
+.env
+data/patients.db
+data/vector_store
+logs/*.jsonl
+web/node_modules
+web/dist
