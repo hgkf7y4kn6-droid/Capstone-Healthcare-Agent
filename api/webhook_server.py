@@ -49,6 +49,12 @@ try:
     import asyncio
 
     app.include_router(portal_router)
+    from api.rate_limiting import limiter, SLOWAPI_AVAILABLE
+    if SLOWAPI_AVAILABLE:
+        from slowapi import _rate_limit_exceeded_handler
+        from slowapi.errors import RateLimitExceeded
+        app.state.limiter = limiter
+        app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
     @app.on_event("startup")
     async def _register_ws_loop():

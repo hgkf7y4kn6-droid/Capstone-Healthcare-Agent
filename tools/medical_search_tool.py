@@ -9,60 +9,12 @@ grounded summarization rather than being shown raw.
 """
 
 import requests
-import xml.etree.ElementTree as ET
 from crewai.tools import tool
 
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import TAVILY_API_KEY
+from integrations.medlineplus import search_medlineplus as _search_medlineplus, search_tavily as _search_tavily
 from monitoring.monitor import track
-
-MEDLINEPLUS_ENDPOINT = "https://wsearch.nlm.nih.gov/ws/query"
-
-
-def _search_medlineplus(query: str, max_results: int = 3) -> list[dict]:
-    params = {"db": "healthTopics", "term": query, "retmax": max_results}
-    resp = requests.get(MEDLINEPLUS_ENDPOINT, params=params, timeout=15)
-    resp.raise_for_status()
-    root = ET.fromstring(resp.content)
-    results = []
-    for doc in root.findall(".//document"):
-        title, snippet, url = "", "", doc.get("url", "")
-        for content in doc.findall("content"):
-            name = content.get("name")
-            text = "".join(content.itertext()).strip()
-            if name == "title":
-                title = text
-            elif name in ("snippet", "FullSummary"):
-                snippet = text[:600]
-        if title:
-            results.append({"source": "MedlinePlus", "title": title, "snippet": snippet, "url": url})
-    return results
-
-
-def _search_tavily(query: str, max_results: int = 3) -> list[dict]:
-    if not TAVILY_API_KEY:
-        return []
-    try:
-        resp = requests.post(
-            "https://api.tavily.com/search",
-            json={
-                "api_key": TAVILY_API_KEY,
-                "query": f"{query} site:who.int OR site:medlineplus.gov",
-                "max_results": max_results,
-                "include_answer": False,
-            },
-            timeout=15,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        return [
-            {"source": "WebSearch(WHO/Medline)", "title": r.get("title", ""),
-             "snippet": (r.get("content", "") or "")[:600], "url": r.get("url", "")}
-            for r in data.get("results", [])
-        ]
-    except requests.exceptions.RequestException:
-        return []
 
 
 @tool("search_disease_information")

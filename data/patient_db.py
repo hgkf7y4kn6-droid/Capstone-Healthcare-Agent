@@ -150,8 +150,11 @@ CREATE TABLE IF NOT EXISTS refill_confirmations (
 
 @contextmanager
 def get_conn():
-    conn = sqlite3.connect(PATIENT_DB_PATH)
+    conn = sqlite3.connect(PATIENT_DB_PATH, timeout=10)
     conn.row_factory = sqlite3.Row
+    # The API serves concurrent requests on worker threads; wait briefly on a
+    # locked database instead of failing the request.
+    conn.execute("PRAGMA busy_timeout = 5000")
     try:
         yield conn
         conn.commit()
@@ -276,6 +279,13 @@ def upsert_patient(full_name: str, external_id: Optional[str] = None, age: int =
         return cur.lastrowid
 
 
+def set_external_id(patient_id: int, external_id: str) -> None:
+    """Assign an external id to an existing patient that has none."""
+    with get_conn() as conn:
+        conn.execute("UPDATE patients SET external_id = ? WHERE patient_id = ? AND external_id IS NULL",
+                     (external_id, patient_id))
+
+
 def get_patient_by_external_id(external_id: str) -> Optional[dict]:
     with get_conn() as conn:
         row = conn.execute(
@@ -377,6 +387,38 @@ def list_appointments(patient_id: Optional[int] = None) -> list[dict]:
                 "ORDER BY a.start_time"
             ).fetchall()
         return [dict(r) for r in rows]
+
+
+def get_appointment(appointment_id: int) -> Optional[dict]:
+    with get_conn() as conn:
+        row = conn.execute(
+            "SELECT a.*, p.full_name FROM appointments a JOIN patients p ON a.patient_id = p.patient_id "
+            "WHERE a.appointment_id = ?", (appointment_id,)
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def update_appointment(appointment_id: int, status: Optional[str] = None, start_time: Optional[str] = None,
+                       doctor_name: Optional[str] = None) -> bool:
+    """Staff confirm/decline/reschedule an appointment (requests made by the
+    patient assistant arrive with status 'requested')."""
+    fields, values = [], []
+    for col, val in (("status", status), ("start_time", start_time), ("doctor_name", doctor_name)):
+        if val is not None:
+            fields.append(f"{col} = ?")
+            values.append(val)
+    if not fields:
+        return False
+    with get_conn() as conn:
+        cur = conn.execute(f"UPDATE appointments SET {', '.join(fields)} WHERE appointment_id = ?",
+                           (*values, appointment_id))
+        return cur.rowcount > 0
+
+
+def get_patient(patient_id: int) -> Optional[dict]:
+    with get_conn() as conn:
+        row = conn.execute("SELECT * FROM patients WHERE patient_id = ?", (patient_id,)).fetchone()
+        return dict(row) if row else None
 
 
 # ---------- Identity verification (HIPAA-style, multi-factor) ----------
