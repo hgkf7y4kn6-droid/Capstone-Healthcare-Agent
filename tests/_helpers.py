@@ -41,11 +41,13 @@ class IsolatedDBTestCase(unittest.TestCase):
     # --- small helpers reused across test files ---
 
     def make_patient(self, name="Test Patient", dob="1980-01-01", address=None,
-                      ssn_last4=None, external_id=None) -> dict:
+                      ssn_last4=None, external_id=None, recent_visit=False) -> dict:
         patient_id = db.upsert_patient(
             full_name=name, external_id=external_id, age=45, sex="F",
             dob=dob, address=address, ssn_last4=ssn_last4,
         )
+        if recent_visit:  # refills need a visit in the last 12 months
+            db.add_history_entry(patient_id, "visit", {"reason": "Checkup"}, True)
         return db.find_patient(name)
 
     def make_prescription(self, patient_id: int, **overrides) -> dict:

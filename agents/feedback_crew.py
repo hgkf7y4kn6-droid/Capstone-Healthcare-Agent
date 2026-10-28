@@ -59,6 +59,7 @@ from monitoring.logging_utils import log_event
 from monitoring.monitor import track
 from data import patient_db as db
 from workflows import feedback_support as fs
+from workflows.safety_gate import gate_message, urgent_prefix
 from workflows import prescription_refill_agent as ra
 
 _REFILL_TRIGGER_KEYWORDS = ("refill", "prescription", "medication")
@@ -275,6 +276,11 @@ def run_feedback_workflow(user_message: str, patient_name: Optional[str] = None,
     reply has no classifiable topic of its own.
     """
     with track("feedback_crew.full_workflow") as run_status:
+        # Safety first, before the open-session shortcut or any classifier.
+        safety, emergency_result = gate_message(user_message, patient_name, source="support")
+        if emergency_result:
+            return emergency_result
+
         # Session-aware routing: an open confirmation takes priority over classification.
         if active_ticket_number:
             existing_session = db.get_latest_refill_confirmation(active_ticket_number)
@@ -293,8 +299,7 @@ def run_feedback_workflow(user_message: str, patient_name: Optional[str] = None,
         category = classification["category"]
 
         log_event("feedback_classification", {
-            "user_message": user_message, "category": category,
-            "method": classification["method"],
+            "category": category, "method": classification["method"],
         })
 
         if category == fs.PRESCRIPTION_REFILL:
@@ -338,7 +343,10 @@ def run_feedback_workflow(user_message: str, patient_name: Optional[str] = None,
                 }
 
         log_event("feedback_response", {
-            "user_message": user_message, "category": category, "response": response_message,
+            "category": category, "response": response_message,
         })
 
+        if safety:  # urgent: lead with the guidance, then still help
+            result["message"] = urgent_prefix(safety) + result["message"]
+            result["safety"] = safety
         return result

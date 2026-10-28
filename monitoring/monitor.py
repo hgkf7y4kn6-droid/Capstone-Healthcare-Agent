@@ -29,6 +29,7 @@ from statistics import mean, median
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import MONITORING_LOG_PATH
+from monitoring.logging_utils import scrub
 
 
 def log_metric(module: str, latency_ms: float, success: bool, meta: dict = None):
@@ -37,7 +38,7 @@ def log_metric(module: str, latency_ms: float, success: bool, meta: dict = None)
         "module": module,
         "latency_ms": round(latency_ms, 2),
         "success": bool(success),
-        **(meta or {}),
+        **scrub(meta or {}),
     }
     with open(MONITORING_LOG_PATH, "a") as f:
         f.write(json.dumps(record) + "\n")

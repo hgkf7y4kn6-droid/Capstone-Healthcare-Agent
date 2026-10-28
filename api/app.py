@@ -45,7 +45,8 @@ from workflows.safety import DISCLAIMER
 PATIENT_SCOPES = ["prescriptions:read", "refills:write", "assistant:use", "records:read"]
 
 app = FastAPI(title=f"{config.APP_NAME} API", version=__version__,
-              docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None)
+              docs_url=None if config.is_production() else "/api/docs",
+              openapi_url=None if config.is_production() else "/api/openapi.json", redoc_url=None)
 app.add_middleware(CORSMiddleware, allow_origins=config.CORS_ORIGINS, allow_credentials=False,
                    allow_methods=["*"], allow_headers=["*"])
 
@@ -68,12 +69,20 @@ def _startup() -> None:
     ensure_ready()
 
 
+CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
+       "connect-src 'self' ws: wss:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'")
+
+
 @app.middleware("http")
 async def _security_headers(request: Request, call_next):
     response = await call_next(request)
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("X-Frame-Options", "DENY")
+    if not request.url.path.startswith("/api/docs"):  # Swagger UI needs a CDN and inline script
+        response.headers.setdefault("Content-Security-Policy", CSP)
+    if config.is_production():
+        response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
     if request.url.path.startswith("/api/"):
         response.headers.setdefault("Cache-Control", "no-store")
     return response
@@ -566,7 +575,7 @@ def me_support(body: PatientSupport, ctx: dict = Depends(require_patient)):
                                    corrected_medication_name=body.medication_name)
     return {"message": result.get("message"), "category": result.get("category"),
             "ticket_number": result.get("ticket_number"), "stage": result.get("stage"),
-            "chained": result.get("chained_refill_agent")}
+            "chained": result.get("chained_refill_agent"), "safety": result.get("safety")}
 
 
 # --------------------------------------------------------------------------- errors + web app

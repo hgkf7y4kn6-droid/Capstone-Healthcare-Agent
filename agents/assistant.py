@@ -63,7 +63,7 @@ def answer(user_query: str, patient_id: Optional[int] = None, engine: Optional[s
             result.setdefault("actions", [])
             result["engine"] = "crew"
         except Exception as exc:  # degrade, never strand the patient
-            log_event("assistant_fallback", {"from": "crew", "error": str(exc)[:300]})
+            log_event("assistant_fallback", {"from": "crew", "error": type(exc).__name__})
             if (engine or ASSISTANT_ENGINE) == "crew":
                 raise
             from agents.concierge import run_concierge

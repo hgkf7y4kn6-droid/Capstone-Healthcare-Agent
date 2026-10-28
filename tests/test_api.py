@@ -24,8 +24,8 @@ class ProductApiTests(IsolatedDBTestCase):
         self.client = TestClient(app)  # no context manager: skips demo seeding on startup
         token = self.client.post("/api/auth/staff", json={"code": "aegistriage-demo", "name": "Test"}).json()["token"]
         self.staff = {"Authorization": f"Bearer {token}"}
-        self.alice = self.make_patient(name="Alice Avery", dob="1970-02-02", ssn_last4="1234", external_id="A1")
-        self.bob = self.make_patient(name="Bob Brook", dob="1980-03-03", external_id="B1")
+        self.alice = self.make_patient(name="Alice Avery", dob="1970-02-02", ssn_last4="1234", external_id="A1", recent_visit=True)
+        self.bob = self.make_patient(name="Bob Brook", dob="1980-03-03", external_id="B1", recent_visit=True)
         self.alice_rx = self.make_prescription(self.alice["patient_id"], medication_name="Metformin 500mg")
         self.bob_rx = self.make_prescription(self.bob["patient_id"], medication_name="Lorazepam 0.5mg",
                                              is_controlled_substance=True, controlled_schedule="CIV")
@@ -40,6 +40,12 @@ class ProductApiTests(IsolatedDBTestCase):
             self.assertEqual(self.client.get(path).status_code, 401, path)
         self.assertEqual(self.client.get("/api/staff/patients",
                                          headers={"Authorization": "Bearer junk"}).status_code, 401)
+
+    def test_security_headers(self):
+        r = self.client.get("/api/health")
+        self.assertIn("default-src 'self'", r.headers["content-security-policy"])
+        self.assertIn("frame-ancestors 'none'", r.headers["content-security-policy"])
+        self.assertEqual(r.headers["x-content-type-options"], "nosniff")
 
     def test_wrong_access_code_is_rejected(self):
         self.assertEqual(self.client.post("/api/auth/staff", json={"code": "guess"}).status_code, 401)
@@ -94,6 +100,18 @@ class ProductApiTests(IsolatedDBTestCase):
         r = self.client.post("/api/me/assistant", headers=alice, json={"message": "I have chest pain"}).json()
         self.assertEqual(r["engine"], "safety")
         self.assertEqual(r["safety"]["level"], "emergency")
+
+    def test_support_form_and_inbox_share_the_emergency_gate(self):
+        alice = self._portal(self.alice)
+        text = "My dad took too many pills"
+        mine = self.client.post("/api/me/support", headers=alice, json={"message": text}).json()
+        self.assertEqual(mine["category"], "safety_emergency")
+        self.assertIn("Poison Control", mine["message"])
+        self.assertEqual(mine["safety"]["rule_id"], "overdose_poisoning")
+        inbox = self.client.post("/api/staff/inbox/messages", headers=self.staff, json={"message": text}).json()
+        self.assertEqual(inbox["category"], "safety_emergency")
+        tickets = self.client.get("/api/staff/inbox", headers=self.staff).json()["tickets"]
+        self.assertEqual(sum(t["complaint_text"].startswith("[URGENT") for t in tickets), 2)
 
     def test_staff_phone_refill_reverifies_identity(self):
         body = {"patient_id": self.alice["patient_id"], "prescription_id": self.alice_rx["prescription_id"],

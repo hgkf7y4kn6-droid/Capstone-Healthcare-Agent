@@ -6,10 +6,18 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from data import patient_db as db
 from tests._helpers import IsolatedDBTestCase
+
+
+class RefillTestCase(IsolatedDBTestCase):
+    """Refills need a visit in the last 12 months, so patients get one by default here."""
+
+    def make_patient(self, *a, recent_visit=True, **kw):
+        return super().make_patient(*a, recent_visit=recent_visit, **kw)
+
 from workflows import prescription_refill as wf
 
 
-class TestRuleEngineGates(IsolatedDBTestCase):
+class TestRuleEngineGates(RefillTestCase):
     def test_controlled_substance_always_fails_regardless_of_refills(self):
         patient = self.make_patient()
         rx = self.make_prescription(patient["patient_id"], is_controlled_substance=True,
@@ -95,7 +103,7 @@ class TestSafeRangeParsing(unittest.TestCase):
         self.assertIsNone(wf._parse_lab_value("Positive"))
 
 
-class TestGoldenPath(IsolatedDBTestCase):
+class TestGoldenPath(RefillTestCase):
     def test_golden_path_writes_queue_and_decrements_refill(self):
         patient = self.make_patient()
         rx = self.make_prescription(patient["patient_id"], remaining_refills=3)
@@ -106,7 +114,7 @@ class TestGoldenPath(IsolatedDBTestCase):
         self.assertEqual(updated_rx["remaining_refills"], 2)
 
 
-class TestContextPreAssembly(IsolatedDBTestCase):
+class TestContextPreAssembly(RefillTestCase):
     def test_payload_shape_and_no_pii_leak(self):
         patient = self.make_patient(address="123 Secret St", ssn_last4="9999")
         db.add_history_entry(patient["patient_id"], "visit", "Checkup")
@@ -130,7 +138,7 @@ class TestContextPreAssembly(IsolatedDBTestCase):
         self.assertEqual(len(reviews), 1)
 
 
-class TestOrchestration(IsolatedDBTestCase):
+class TestOrchestration(RefillTestCase):
     def test_process_refill_request_dob_only_golden_path(self):
         patient = self.make_patient(dob="1979-03-15")
         rx = self.make_prescription(patient["patient_id"], remaining_refills=2)
@@ -185,3 +193,31 @@ class TestOrchestration(IsolatedDBTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestVisitAndAllergyGates(RefillTestCase):
+    def test_no_visit_on_record_routes_to_review(self):
+        p = self.make_patient(recent_visit=False)
+        rx = self.make_prescription(p["patient_id"])
+        r = wf.run_clinical_rule_engine(rx)
+        self.assertFalse(r["passed"])
+        self.assertEqual(r["reason"], "No Recent Visit")
+
+    def test_visit_older_than_12_months_routes_to_review(self):
+        p = self.make_patient(recent_visit=False)
+        db.add_history_entry(p["patient_id"], "visit", {"reason": "old"}, True, created_at="2020-01-01T00:00:00+00:00")
+        r = wf.run_clinical_rule_engine(self.make_prescription(p["patient_id"]))
+        self.assertEqual(r["reason"], "No Recent Visit")
+
+    def test_recent_visit_passes(self):
+        p = self.make_patient()
+        self.assertTrue(wf.run_clinical_rule_engine(self.make_prescription(p["patient_id"]))["passed"])
+
+    def test_documented_allergy_routes_to_review(self):
+        p = self.make_patient()
+        db.add_history_entry(p["patient_id"], "alert", {"allergy": "Penicillin", "severity": "unspecified"}, True)
+        for med in ("Amoxicillin 500mg", "Penicillin VK"):
+            r = wf.run_clinical_rule_engine(self.make_prescription(p["patient_id"], medication_name=med))
+            self.assertEqual(r["reason"], "Documented Allergy Match", med)
+        ok = wf.run_clinical_rule_engine(self.make_prescription(p["patient_id"], medication_name="Lisinopril 10mg"))
+        self.assertTrue(ok["passed"])

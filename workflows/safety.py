@@ -54,7 +54,7 @@ RULES: list[SafetyRule] = [
     ),
     SafetyRule(
         "overdose_poisoning", EMERGENCY,
-        [r"\boverdos", r"\btook (too many|a lot of|the whole)\b", r"\bpoison(ed|ing)?\b",
+        [r"\boverdos", r"\btook (too many|a lot of|the whole)\b", r"\btoo many (pills|tablets|capsules|meds|medications)\b", r"\bpoison(ed|ing)?\b",
          r"\bswallowed\b.*\b(bleach|cleaner|battery|pills)\b"],
         "This could be a poisoning or overdose",
         "Call Poison Control at 1-800-222-1222 now. If the person is hard to wake, having "

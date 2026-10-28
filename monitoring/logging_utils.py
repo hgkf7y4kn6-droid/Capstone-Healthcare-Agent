@@ -20,12 +20,24 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import AGENT_LOG_PATH
 
 
+# Free text a patient or a model wrote (and tool arguments/results built from
+# chart data). Logs keep its length, never its content.
+TEXT_KEYS = {"user_query", "user_message", "final_response", "response", "message", "complaint",
+             "query", "args", "result", "raw_llm_output", "content", "notes"}
+
+
+def scrub(payload: dict) -> dict:
+    return {k: ({"chars": len(json.dumps(v, default=str))} if k in TEXT_KEYS and v is not None else v)
+            for k, v in payload.items()}
+
+
 def log_event(event_type: str, payload: dict):
-    """event_type: 'plan' | 'tool_call' | 'response' | 'error'"""
+    """event_type: 'plan' | 'tool_call' | 'response' | 'error'. Message text is
+    never written: see TEXT_KEYS."""
     record = {
         "timestamp": dt.datetime.now(dt.timezone.utc).isoformat(),
         "event_type": event_type,
-        **payload,
+        **scrub(payload),
     }
     with open(AGENT_LOG_PATH, "a") as f:
         f.write(json.dumps(record) + "\n")

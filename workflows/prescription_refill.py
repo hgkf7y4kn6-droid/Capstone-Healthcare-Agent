@@ -89,8 +89,50 @@ def _parse_safe_range(range_str: str):
     return lambda v: True  # unrecognized format: don't block on it
 
 
+VISIT_RECENCY_DAYS = 365
+
+# Allergy names that imply a drug family. Deliberately short: this routes to a
+# clinician, so a miss falls back to the clinician's own review, and a false
+# positive costs one review. A clinician owns the real list.
+_ALLERGY_FAMILIES = {
+    "penicillin": ("penicillin", "amoxicillin", "ampicillin", "augmentin"),
+    "sulfa": ("sulfamethoxazole", "trimethoprim", "sulfasalazine", "bactrim"),
+    "nsaid": ("ibuprofen", "naproxen", "diclofenac", "meloxicam", "aspirin"),
+    "aspirin": ("aspirin",),
+    "codeine": ("codeine", "hydrocodone", "oxycodone", "morphine"),
+}
+
+
+def _documented_allergy_match(patient_id: int, medication_name: str) -> Optional[str]:
+    med = (medication_name or "").lower()
+    for entry in db.get_history(patient_id):
+        content = entry["content"]
+        if entry["entry_type"] != "alert" or not isinstance(content, dict) or not content.get("allergy"):
+            continue
+        allergy = str(content["allergy"]).lower()
+        names = {allergy.split()[0], allergy}
+        for family, drugs in _ALLERGY_FAMILIES.items():
+            if family in allergy:
+                names.update(drugs)
+        if any(n and n in med for n in names):
+            return str(content["allergy"])
+    return None
+
+
+def _days_since(iso: Optional[str]) -> Optional[int]:
+    if not iso:
+        return None
+    try:
+        when = dt.datetime.fromisoformat(iso.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if when.tzinfo is None:
+        when = when.replace(tzinfo=dt.timezone.utc)
+    return (dt.datetime.now(dt.timezone.utc) - when).days
+
+
 def run_clinical_rule_engine(prescription: dict) -> dict:
-    """Runs the three safety gates in order and returns the first failure,
+    """Runs the safety gates in order and returns the first failure,
     or a pass result if all gates clear.
 
     Returns: {"passed": bool, "reason": str|None, "detail": str|None}
@@ -106,6 +148,29 @@ def run_clinical_rule_engine(prescription: dict) -> dict:
                 "detail": f"{prescription['medication_name']} is a controlled substance"
                           f"{' (Schedule ' + prescription['controlled_schedule'] + ')' if prescription.get('controlled_schedule') else ''} "
                           f"and requires manual clinician review regardless of refill/lab status.",
+            }
+
+        # Gate 1b: a documented allergy that matches the drug always goes to a clinician.
+        allergy = _documented_allergy_match(prescription["patient_id"], prescription["medication_name"])
+        if allergy:
+            status["success"] = False
+            return {
+                "passed": False,
+                "reason": "Documented Allergy Match",
+                "detail": f"{prescription['medication_name']} may conflict with the documented allergy "
+                          f"'{allergy}'. A clinician must confirm before any refill.",
+            }
+
+        # Gate 1c: no visit in the last 12 months (or none on record).
+        days = _days_since(db.get_last_visit_date(prescription["patient_id"]))
+        if days is None or days > VISIT_RECENCY_DAYS:
+            status["success"] = False
+            return {
+                "passed": False,
+                "reason": "No Recent Visit",
+                "detail": f"{prescription['medication_name']} can't be refilled automatically: "
+                          f"{'no visit is on record' if days is None else f'the last visit was {days} days ago'} "
+                          f"(a visit within {VISIT_RECENCY_DAYS} days is required).",
             }
 
         # Gate 2: Refill validity
