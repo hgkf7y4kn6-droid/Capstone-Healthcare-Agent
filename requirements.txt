@@ -1,4 +1,4 @@
-# Core runtime — enough to host Tendwell (API + web console) with the
+# Core runtime — enough to host Tendwell AA (API + web console) with the
 # deterministic concierge. Everything AI-heavy lives in requirements-ai.txt.
 fastapi>=0.115
 uvicorn[standard]>=0.30

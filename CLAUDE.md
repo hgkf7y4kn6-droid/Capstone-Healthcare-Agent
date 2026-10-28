@@ -1,4 +1,4 @@
-# Tendwell — notes for coding agents
+# Tendwell AA — notes for coding agents
 
 Read `README.md` first; the design system is `docs/design-system.md`.
 

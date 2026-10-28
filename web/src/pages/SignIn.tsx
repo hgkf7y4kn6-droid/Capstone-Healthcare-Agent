@@ -45,7 +45,7 @@ export function SignIn() {
   return (
     <div className="grid min-h-svh lg:grid-cols-[1fr_1.1fr]">
       <aside className="relative hidden flex-col justify-between overflow-hidden bg-hero p-10 text-on-hero lg:flex">
-        <Link to="/" aria-label="Tendwell home"><Brand inverted /></Link>
+        <Link to="/" aria-label="Tendwell AA home"><Brand inverted /></Link>
         <div>
           <p className="max-w-[18ch] font-display text-[46px] leading-[1.05]">{greeting()}. Here's what came in overnight.</p>
           <p className="mt-4 max-w-[42ch] text-hero-soft">

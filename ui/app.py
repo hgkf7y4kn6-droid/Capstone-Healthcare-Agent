@@ -24,7 +24,7 @@ from monitoring.monitor import summarize_latency, throughput_over_time
 from workflows.prescription_refill import process_refill_request
 from evaluation.feedback_evaluator import run_feedback_eval_suite, summarize_feedback_eval
 
-st.set_page_config(page_title="Tendwell ops console", layout="wide")
+st.set_page_config(page_title="Tendwell AA ops console", layout="wide")
 
 
 @st.cache_resource
@@ -42,7 +42,7 @@ def _init_db_once():
 
 _init_db_once()
 
-st.title("Tendwell ops console")
+st.title("Tendwell AA ops console")
 st.caption("Internal engineering view: agent traces, evaluation suites and raw queues. "
            "Clinic staff use the web console (uvicorn api.app:app) instead.")
 st.caption("💡 Runs on a free local LLM (no API key) — the assistant tabs below load the model on first use.")

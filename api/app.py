@@ -1,5 +1,5 @@
 """
-Tendwell product API — the one server behind the web app.
+Tendwell AA product API — the one server behind the web app.
 
     uvicorn api.app:app --reload --port 8000
 

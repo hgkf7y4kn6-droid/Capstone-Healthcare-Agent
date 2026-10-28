@@ -49,7 +49,7 @@ async function request<T>(path: string, init: RequestInit & { as?: "staff" | "pa
   try {
     res = await fetch(path, { ...init, headers });
   } catch {
-    throw new ApiError(0, "Can't reach Tendwell. Check your connection and try again.");
+    throw new ApiError(0, "Can't reach Tendwell AA. Check your connection and try again.");
   }
   if (res.status === 401 && init.as === "staff") {
     session.setStaff(null);

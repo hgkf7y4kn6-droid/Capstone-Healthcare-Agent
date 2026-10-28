@@ -1,5 +1,5 @@
 """
-Central configuration for Tendwell (the agentic healthcare assistant).
+Central configuration for Tendwell AA (the agentic healthcare assistant).
 
 All secrets are read from environment variables. NEVER hardcode API keys
 in this file or anywhere else in the codebase.
@@ -24,7 +24,7 @@ except ImportError:  # dotenv is a convenience, never a hard requirement
     pass
 
 # ---- Product ----
-APP_NAME = os.getenv("APP_NAME", "Tendwell")
+APP_NAME = os.getenv("APP_NAME", "Tendwell AA")
 APP_ENV = os.getenv("APP_ENV", "development")  # development | staging | production
 CLINIC_NAME = os.getenv("CLINIC_NAME", "Horsham Family Health")
 CLINIC_PHONE = os.getenv("CLINIC_PHONE", "(215) 555-0142")

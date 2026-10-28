@@ -1,5 +1,5 @@
 /**
- * Tendwell design tokens — "Scrubs & Ceil". The single source for color,
+ * Tendwell AA design tokens — "Scrubs & Ceil". The single source for color,
  * radius, type and motion. index.css mirrors the colors as CSS variables for
  * Tailwind; tests/tokens.test.mjs fails if they drift or contrast drops.
  * See docs/design-system.md.

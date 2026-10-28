@@ -1,4 +1,4 @@
-"""Bump the last digit of Tendwell's version everywhere it lives.
+"""Bump the last digit of Tendwell AA's version everywhere it lives.
 
     python -m scripts.bump_version          # 1.0.0 -> 1.0.1
     python -m scripts.bump_version minor    # 1.0.7 -> 1.1.0

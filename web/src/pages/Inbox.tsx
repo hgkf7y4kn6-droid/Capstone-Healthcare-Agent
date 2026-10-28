@@ -121,7 +121,7 @@ function Triage({ onChange }: { onChange: () => void }) {
   return (
     <Section title="Triage a message">
       <div className="panel p-4">
-        <p className="text-sm text-ink-soft">Paste a message as it arrived. Tendwell sorts it and drafts the reply the patient would get.</p>
+        <p className="text-sm text-ink-soft">Paste a message as it arrived. Tendwell AA sorts it and drafts the reply the patient would get.</p>
         <div className="mt-3 grid grid-cols-2 gap-2">
           <input className="field" placeholder="Patient name" value={patient} onChange={(e) => setPatient(e.target.value)} aria-label="Patient name" />
           <input className="field" placeholder="Medication, if any" value={medication} onChange={(e) => setMedication(e.target.value)} aria-label="Medication name" />
