@@ -68,6 +68,13 @@ SESSION_SECRET = os.getenv("SESSION_SECRET", "" if APP_ENV == "production" else 
 STAFF_ACCESS_CODE = os.getenv("STAFF_ACCESS_CODE", "" if APP_ENV == "production" else "aegistriage-demo")
 SESSION_TTL_HOURS = int(os.getenv("SESSION_TTL_HOURS", "8"))
 STAFF_IDLE_MINUTES = int(os.getenv("STAFF_IDLE_MINUTES", "15"))
+# Clerk (hosted staff sign-in). When CLERK_PUBLISHABLE_KEY is set, staff sign in through Clerk and the
+# server verifies its session tokens; local accounts and the demo code are switched off (api/clerk_auth.py).
+# Verification needs only public keys: the issuer's JWKS, or CLERK_JWT_KEY (PEM) to skip the network call.
+# The Clerk secret key is not used by this server and should not be set here.
+CLERK_PUBLISHABLE_KEY = os.getenv("CLERK_PUBLISHABLE_KEY", "")
+CLERK_JWT_KEY = os.getenv("CLERK_JWT_KEY", "").replace("\\n", "\n")
+CLERK_AUTHORIZED_PARTIES = [o.strip() for o in os.getenv("CLERK_AUTHORIZED_PARTIES", "").split(",") if o.strip()]
 CORS_ORIGINS = [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",") if o.strip()]
 
 # ---- Async / queues ----

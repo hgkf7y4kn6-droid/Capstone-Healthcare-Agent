@@ -1,11 +1,12 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { lazy, Suspense, useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { Brand } from "../components/Brand";
 import { ErrorNote } from "../components/ui";
-import { api, session, type StaffSession } from "../lib/api";
+import { api, session, type PublicConfig, type StaffSession } from "../lib/api";
+
+const ClerkSignIn = lazy(() => import("../lib/ClerkBridge").then((m) => ({ default: m.default })));
 import { greeting } from "../lib/format";
 
-type PublicConfig = { clinic: { name: string }; demo: { enabled: boolean; access_code: string | null } };
 
 export function SignIn() {
   const navigate = useNavigate();
@@ -68,43 +69,54 @@ export function SignIn() {
         <div className="lg:hidden"><Link to="/"><Brand /></Link></div>
         <div className="m-auto w-full max-w-[400px] py-10">
           <h1 className="font-display text-[36px] font-medium">Sign in to the console</h1>
-          <p className="mt-1 text-ink-soft">
-            {useDemo ? "Use the demo access code below." : "Use your account and the code from your authenticator app."}
-          </p>
+          {cfg?.clerk ? (
+            <div className="mt-8">
+              <Suspense fallback={<p className="text-ink-soft" role="status">Loading sign-in…</p>}>
+                <ClerkSignIn />
+              </Suspense>
+            </div>
+          ) : (
+            <>
+            <p className="mt-1 text-ink-soft">
+              {useDemo ? "Use the demo access code below." : "Use your account and the code from your authenticator app."}
+            </p>
 
-          <form onSubmit={submit} className="mt-8 space-y-4">
-            {useDemo ? (
-              <>
-                <label className="block">
-                  <span className="mb-1.5 block font-semibold">Your name</span>
-                  <input className="field" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="Shown in the activity log" />
-                </label>
-                <label className="block">
-                  <span className="mb-1.5 block font-semibold">Access code</span>
-                  <input className="field" type="password" value={code} onChange={(e) => setCode(e.target.value)} autoComplete="off" required />
-                </label>
-              </>
-            ) : (
-              <>
-                <label className="block">
-                  <span className="mb-1.5 block font-semibold">Email</span>
-                  <input className="field" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" required />
-                </label>
-                <label className="block">
-                  <span className="mb-1.5 block font-semibold">Password</span>
-                  <input className="field" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
-                </label>
-                <label className="block">
-                  <span className="mb-1.5 block font-semibold">Authenticator code</span>
-                  <input className="field" inputMode="numeric" pattern="[0-9 ]{6,7}" maxLength={7} value={otp} onChange={(e) => setOtp(e.target.value)} autoComplete="one-time-code" required />
-                </label>
-              </>
-            )}
-            {error && <ErrorNote message={error} />}
-            <button className="btn btn-primary w-full" disabled={busy || (useDemo ? !code : !email || !password || otp.length < 6)}>
-              {busy ? "Signing in…" : "Sign in"}
-            </button>
-          </form>
+            <form onSubmit={submit} className="mt-8 space-y-4">
+              {useDemo ? (
+                <>
+                  <label className="block">
+                    <span className="mb-1.5 block font-semibold">Your name</span>
+                    <input className="field" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="Shown in the activity log" />
+                  </label>
+                  <label className="block">
+                    <span className="mb-1.5 block font-semibold">Access code</span>
+                    <input className="field" type="password" value={code} onChange={(e) => setCode(e.target.value)} autoComplete="off" required />
+                  </label>
+                </>
+              ) : (
+                <>
+                  <label className="block">
+                    <span className="mb-1.5 block font-semibold">Email</span>
+                    <input className="field" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" required />
+                  </label>
+                  <label className="block">
+                    <span className="mb-1.5 block font-semibold">Password</span>
+                    <input className="field" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
+                  </label>
+                  <label className="block">
+                    <span className="mb-1.5 block font-semibold">Authenticator code</span>
+                    <input className="field" inputMode="numeric" pattern="[0-9 ]{6,7}" maxLength={7} value={otp} onChange={(e) => setOtp(e.target.value)} autoComplete="one-time-code" required />
+                  </label>
+                </>
+              )}
+              {error && <ErrorNote message={error} />}
+              <button className="btn btn-primary w-full" disabled={busy || (useDemo ? !code : !email || !password || otp.length < 6)}>
+                {busy ? "Signing in…" : "Sign in"}
+              </button>
+            </form>
+
+            </>
+          )}
 
           {cfg?.demo.enabled && cfg.demo.access_code && (
             <div className="mt-8 rounded-row bg-ceil px-4 py-3 text-ceil-ink">

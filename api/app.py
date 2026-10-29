@@ -35,7 +35,7 @@ from pydantic import BaseModel, Field
 
 import config
 from version import __version__
-from api import staff_auth
+from api import clerk_auth, staff_auth
 from api.portal_auth import PortalAuthError, create_test_token, decode_portal_token, require_scope, resolve_patient
 from data import audit_log, patient_db as db
 from data import staff_store
@@ -70,8 +70,19 @@ def _startup() -> None:
     ensure_ready()
 
 
-CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
-       "connect-src 'self' ws: wss:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'")
+def build_csp() -> str:
+    """Strict by default; with Clerk configured, add only its frontend host (script, API, sign-in widget)."""
+    script, connect, img, frame = ["'self'"], ["'self'", "ws:", "wss:"], ["'self'", "data:"], []
+    if clerk_auth.configured():
+        host = f"https://{clerk_auth.issuer().removeprefix('https://')}"
+        script.append(host); connect.append(host); img.append("https://img.clerk.com")
+        frame.append("https://challenges.cloudflare.com")  # Clerk's bot check
+    parts = ["default-src 'self'", f"script-src {' '.join(script)}", "style-src 'self' 'unsafe-inline'",
+             f"img-src {' '.join(img)}", f"connect-src {' '.join(connect)}", "worker-src 'self' blob:",
+             "frame-ancestors 'none'", "base-uri 'self'", "form-action 'self'", "object-src 'none'"]
+    if frame:
+        parts.append(f"frame-src {' '.join(frame)}")
+    return "; ".join(parts)
 
 
 @app.middleware("http")
@@ -90,7 +101,7 @@ async def _security_headers(request: Request, call_next):
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("X-Frame-Options", "DENY")
     if not request.url.path.startswith("/api/docs"):  # Swagger UI needs a CDN and inline script
-        response.headers.setdefault("Content-Security-Policy", CSP)
+        response.headers.setdefault("Content-Security-Policy", build_csp())
     if config.is_production():
         response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
     if request.url.path.startswith("/api/"):
@@ -169,7 +180,9 @@ def public_config():
     return {
         "app_name": config.APP_NAME, "version": __version__, "env": config.APP_ENV,
         "clinic": {"name": config.CLINIC_NAME, "phone": config.CLINIC_PHONE},
-        "demo": {"enabled": config.DEMO_MODE, "access_code": config.STAFF_ACCESS_CODE if config.DEMO_MODE else None},
+        "demo": {"enabled": config.DEMO_MODE and not clerk_auth.configured(),
+                 "access_code": config.STAFF_ACCESS_CODE if config.DEMO_MODE and not clerk_auth.configured() else None},
+        "clerk": {"publishable_key": config.CLERK_PUBLISHABLE_KEY} if clerk_auth.configured() else None,
         "assistant_engine": resolve_engine(),
         "integrations": {"calcom": bool(config.CALCOM_API_KEY), "tavily": bool(config.TAVILY_API_KEY),
                          "portal_webhook": bool(config.PORTAL_WEBHOOK_URL), "sqs": bool(config.AWS_SQS_QUEUE_URL)},
@@ -234,7 +247,7 @@ def staff_logout(response: Response, staff: dict = Depends(staff_auth.require_st
 
 @app.get("/api/auth/staff/me")
 def staff_me(staff: dict = Depends(staff_auth.require_staff)):
-    return {"name": staff["sub"], "role": staff["role"], "expires_at": staff["exp"], "demo": staff["demo"],
+    return {"name": staff.get("name", staff["sub"]), "role": staff["role"], "expires_at": staff["exp"], "demo": staff["demo"],
             "idle_timeout_minutes": config.STAFF_IDLE_MINUTES}
 
 
@@ -250,6 +263,11 @@ class NewStaffUser(BaseModel):
 admin_only = staff_auth.require_role("admin")
 
 
+def _local_accounts_only() -> None:
+    if clerk_auth.configured():
+        raise HTTPException(status.HTTP_409_CONFLICT, "Accounts are managed in Clerk.")
+
+
 @app.get("/api/staff/users")
 def staff_users(staff: dict = Depends(admin_only)):
     return {"users": staff_store.list_users()}
@@ -257,6 +275,7 @@ def staff_users(staff: dict = Depends(admin_only)):
 
 @app.post("/api/staff/users", status_code=201)
 def staff_create_user(body: NewStaffUser, staff: dict = Depends(admin_only)):
+    _local_accounts_only()
     """Returns the authenticator secret once; it can't be read back."""
     try:
         user = staff_auth.create_account(body.email, body.name, body.role, body.password)
@@ -278,6 +297,7 @@ def _target_user(user_id: int) -> dict:
 
 @app.post("/api/staff/users/{user_id}/deactivate")
 def staff_deactivate_user(user_id: int, staff: dict = Depends(admin_only)):
+    _local_accounts_only()
     user = _target_user(user_id)
     if user["role"] == "admin" and user["active"] and staff_store.count_active_admins() <= 1:
         raise HTTPException(409, "That's the last active admin. Add another admin first.")
@@ -290,6 +310,7 @@ def staff_deactivate_user(user_id: int, staff: dict = Depends(admin_only)):
 
 @app.post("/api/staff/users/{user_id}/activate")
 def staff_activate_user(user_id: int, staff: dict = Depends(admin_only)):
+    _local_accounts_only()
     _target_user(user_id)
     staff_store.set_active(user_id, True)
     audit_log.record(staff["sub"], staff["role"], "staff_user.activate", resource=f"user_id={user_id}")
@@ -298,6 +319,7 @@ def staff_activate_user(user_id: int, staff: dict = Depends(admin_only)):
 
 @app.post("/api/staff/users/{user_id}/revoke-sessions")
 def staff_revoke_sessions(user_id: int, staff: dict = Depends(admin_only)):
+    _local_accounts_only()
     _target_user(user_id)
     ended = staff_store.revoke_user_sessions(user_id, int(time.time()))
     audit_log.record(staff["sub"], staff["role"], "staff_user.revoke_sessions", resource=f"user_id={user_id}",

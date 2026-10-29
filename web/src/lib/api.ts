@@ -7,6 +7,11 @@ const STAFF_KEY = "tw.staff";
 const PATIENT_KEY = "tw.patient";
 
 export type StaffSession = { name: string; role: string; expires_at: number; demo: boolean; idle_timeout_minutes: number };
+export type PublicConfig = {
+  clinic: { name: string };
+  demo: { enabled: boolean; access_code: string | null };
+  clerk: { publishable_key: string } | null;
+};
 export type PatientSession = { token: string; patient: { patient_id: number; full_name: string; first_name: string } };
 
 function read<T>(key: string): T | null {
@@ -36,6 +41,15 @@ export const session = {
   setPatient: (s: PatientSession | null) => write(PATIENT_KEY, s),
 };
 
+// Set by ClerkBridge when staff sign in through Clerk: returns a fresh short-lived
+// session token for each request, so nothing long-lived sits in the browser.
+let staffToken: (() => Promise<string | null>) | null = null;
+let staffSignOut: (() => Promise<unknown>) | null = null;
+export function attachClerk(getToken: () => Promise<string | null>, signOut: () => Promise<unknown>) {
+  staffToken = getToken;
+  staffSignOut = signOut;
+}
+
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -46,7 +60,7 @@ async function request<T>(path: string, init: RequestInit & { as?: "staff" | "pa
   const headers = new Headers(init.headers);
   if (init.body && !headers.has("content-type")) headers.set("content-type", "application/json");
   if (init.as === "staff") headers.set("x-requested-with", "aegis");  // required with the cookie on writes
-  const token = init.as === "patient" ? session.patient()?.token : null;
+  const token = init.as === "patient" ? session.patient()?.token : init.as === "staff" && staffToken ? await staffToken().catch(() => null) : null;
   if (token) headers.set("authorization", `Bearer ${token}`);
   let res: Response;
   try {
@@ -78,7 +92,8 @@ export const api = {
 /** Ends the server-side session, then forgets it here. Signs out locally even if the call fails. */
 export async function signOutStaff() {
   try {
-    await api.post("/api/auth/staff/logout", {}, "staff");
+    if (staffSignOut) await staffSignOut();
+    else await api.post("/api/auth/staff/logout", {}, "staff");
   } catch {
     /* already expired or offline: nothing left to revoke from here */
   }

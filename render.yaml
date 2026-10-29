@@ -27,6 +27,10 @@ services:
         generateValue: true
       - key: STAFF_ACCESS_CODE   # demo code only (DEMO_MODE=true); real staff use accounts
         sync: false
+      - key: CLERK_PUBLISHABLE_KEY   # public key; turns on Clerk staff sign-in
+        sync: false
+      - key: CLERK_AUTHORIZED_PARTIES  # e.g. https://aegistriage.richesdigitalventures.com
+        sync: false
       - key: CORS_ORIGINS
         sync: false
       - key: CALCOM_API_KEY

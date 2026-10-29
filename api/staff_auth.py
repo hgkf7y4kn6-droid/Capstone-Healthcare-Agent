@@ -11,9 +11,10 @@ STAFF_IDLE_MINUTES without use or SESSION_TTL_HOURS in total.
 The shared clinic access code survives only for the synthetic-data demo:
 it works when DEMO_MODE is on and nowhere else.
 
-Clerk (or any hosted IdP) would replace `login` and the user table, not the
-session or role checks in this file: routes depend on `require_staff` and
-`require_role`, never on how someone proved who they are.
+When CLERK_PUBLISHABLE_KEY is set, Clerk replaces all of the above: its bearer
+token is verified (api/clerk_auth.py), the role comes from a claim, and local
+accounts, the cookie and the demo code are refused. Routes depend on
+`require_staff` and `require_role`, never on how someone proved who they are.
 """
 
 import base64
@@ -34,6 +35,7 @@ from fastapi import Depends, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 import config
+from api import clerk_auth
 from data import audit_log, staff_store as store
 
 ROLES = ("admin", "provider", "front_desk")
@@ -166,8 +168,14 @@ def _guard(client: str) -> None:
         raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, "Too many attempts. Try again in a few minutes.")
 
 
+def _local_off() -> None:
+    if clerk_auth.configured():
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Sign in with your organization account.")
+
+
 def login(email: str, password: str, otp: str, client: str) -> dict:
     """Email + password + authenticator code. Every failure reads the same."""
+    _local_off()
     _guard(client)
     generic = HTTPException(status.HTTP_401_UNAUTHORIZED, "That email, password or code didn't match.")
     user = store.get_user_by_email((email or "").strip().lower())
@@ -191,7 +199,7 @@ def login(email: str, password: str, otp: str, client: str) -> dict:
 
 def demo_sign_in(code: str, name: str, client: str) -> dict:
     """Shared code for the synthetic-data demo only."""
-    if not config.DEMO_MODE or not config.STAFF_ACCESS_CODE:
+    if not config.DEMO_MODE or not config.STAFF_ACCESS_CODE or clerk_auth.configured():
         raise HTTPException(status.HTTP_403_FORBIDDEN, "The shared access code is only available in demo mode.")
     _guard(client)
     if not hmac.compare_digest((code or "").strip().encode(), config.STAFF_ACCESS_CODE.encode()):
@@ -226,9 +234,17 @@ def require_staff(request: Request, creds: HTTPAuthorizationCredentials = Depend
         if creds.scheme.lower() != "bearer":
             raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Sign in to continue.")
         token, via_cookie = creds.credentials, False
+        if clerk_auth.configured():  # Clerk replaces local sessions entirely
+            if not clerk_auth.looks_like_jwt(token):
+                raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Sign in to continue.")
+            claims = clerk_auth.verify(token)
+            claims["token"] = token
+            request.state.staff = claims
+            audit_log.record_request(request, claims["sub"], claims["role"])
+            return claims
     else:
         token, via_cookie = request.cookies.get(COOKIE), True
-    if not token or not config.SESSION_SECRET:
+    if not token or not config.SESSION_SECRET or (clerk_auth.configured() and via_cookie):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Sign in to continue.")
     if via_cookie and request.method not in ("GET", "HEAD", "OPTIONS") \
             and request.headers.get(CSRF_HEADER) != CSRF_VALUE:

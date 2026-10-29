@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Link, Route, Routes } from "react-router";
 import "./index.css";
 import { MoreMenu, Shell } from "./components/Shell";
+import type { PublicConfig } from "./lib/api";
 import { applyStoredTheme } from "./components/ThemeToggle";
 import { Inbox } from "./pages/Inbox";
 import { InsightsPage } from "./pages/Insights";
@@ -30,8 +31,16 @@ function NotFound() {
   );
 }
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+async function boot() {
+  // When the server has Clerk configured, staff sign in through it; otherwise the local/demo form is used.
+  let key: string | null = null;
+  try {
+    const cfg = (await (await fetch("/api/public/config")).json()) as PublicConfig;
+    key = cfg.clerk?.publishable_key ?? null;
+  } catch {
+    /* offline or server down: render the app and let each screen report it */
+  }
+  const app = (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
@@ -51,5 +60,14 @@ createRoot(document.getElementById("root")!).render(
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
-  </StrictMode>,
-);
+  );
+  const root = createRoot(document.getElementById("root")!);
+  if (key) {
+    const { ClerkBridge } = await import("./lib/ClerkBridge");
+    root.render(<StrictMode><ClerkBridge publishableKey={key}>{app}</ClerkBridge></StrictMode>);
+  } else {
+    root.render(<StrictMode>{app}</StrictMode>);
+  }
+}
+
+void boot();
