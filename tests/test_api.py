@@ -22,8 +22,9 @@ class ProductApiTests(IsolatedDBTestCase):
     def setUp(self):
         super().setUp()
         self.client = TestClient(app)  # no context manager: skips demo seeding on startup
-        token = self.client.post("/api/auth/staff", json={"code": "aegistriage-demo", "name": "Test"}).json()["token"]
-        self.staff = {"Authorization": f"Bearer {token}"}
+        r = self.client.post("/api/auth/staff", json={"code": "aegistriage-demo", "name": "Test"})
+        self.assertNotIn("token", r.json())  # the session lives in an httpOnly cookie, not the body
+        self.staff = {"X-Requested-With": "aegis"}  # the cookie rides in the client's jar
         self.alice = self.make_patient(name="Alice Avery", dob="1970-02-02", ssn_last4="1234", external_id="A1", recent_visit=True)
         self.bob = self.make_patient(name="Bob Brook", dob="1980-03-03", external_id="B1", recent_visit=True)
         self.alice_rx = self.make_prescription(self.alice["patient_id"], medication_name="Metformin 500mg")
@@ -36,8 +37,11 @@ class ProductApiTests(IsolatedDBTestCase):
         return {"Authorization": f"Bearer {r.json()['token']}"}
 
     def test_staff_routes_require_a_session(self):
-        for path in ("/api/staff/overview", "/api/staff/patients", "/api/staff/refills", "/api/staff/insights"):
-            self.assertEqual(self.client.get(path).status_code, 401, path)
+        anon = TestClient(app)
+        for path in ("/api/staff/overview", "/api/staff/patients", "/api/staff/refills", "/api/staff/insights",
+                     "/api/staff/users", "/api/staff/audit"):
+            self.assertEqual(anon.get(path).status_code, 401, path)
+        # an explicit bad bearer wins over a valid cookie
         self.assertEqual(self.client.get("/api/staff/patients",
                                          headers={"Authorization": "Bearer junk"}).status_code, 401)
 

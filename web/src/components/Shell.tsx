@@ -1,7 +1,7 @@
 import { CalendarClock, ChartLine, House, Inbox, LogOut, Menu, Pill, Settings, Users } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router";
-import { api, session } from "../lib/api";
+import { api, session, signOutStaff } from "../lib/api";
 import { Brand } from "./Brand";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -45,7 +45,7 @@ export function Shell() {
   if (!staff) return null;
 
   const signOut = () => {
-    session.setStaff(null);
+    void signOutStaff();
     navigate("/sign-in");
   };
 
@@ -136,6 +136,10 @@ export function Shell() {
 
 export function MoreMenu() {
   const navigate = useNavigate();
+  const signOut = () => {
+    void signOutStaff();
+    navigate("/sign-in");
+  };
   return (
     <div>
       <h1 className="mb-4 font-display text-[34px] font-medium">More</h1>
@@ -148,7 +152,7 @@ export function MoreMenu() {
         ))}
         <button
           className="flex w-full items-center gap-3 px-4 py-4 text-left font-semibold text-urgent hover:bg-sunken"
-          onClick={() => { session.setStaff(null); navigate("/sign-in"); }}
+          onClick={signOut}
         >
           <LogOut size={19} /> Sign out
         </button>

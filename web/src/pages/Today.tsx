@@ -11,7 +11,7 @@ type Overview = {
   counts: { reviews: number; appointment_requests: number; open_tickets: number; sent_to_pharmacy: number; patients: number; safety_flags: number };
   auto_approval_rate: number | null;
   attention: { kind: "review" | "appointment" | "ticket"; id: number | string; title: string; detail: string; tone: string; at: string }[];
-  checklist: { calendar_connected: boolean; portal_connected: boolean; own_access_code: boolean; patients_loaded: boolean };
+  checklist: { calendar_connected: boolean; portal_connected: boolean; staff_accounts: boolean; patients_loaded: boolean };
 };
 type Activity = { type: string; title: string; detail: string; tone: string; at: string }[];
 
@@ -124,7 +124,7 @@ function StartHere({ checklist }: { checklist: Overview["checklist"] }) {
   });
   const items = [
     { done: checklist.patients_loaded, label: "Load your patient roster", hint: "Import from your EHR export" },
-    { done: checklist.own_access_code, label: "Set your own staff access code", hint: "Replace the demo code before real use" },
+    { done: checklist.staff_accounts, label: "Create staff accounts", hint: "One per person, with an authenticator app" },
     { done: checklist.calendar_connected, label: "Connect Cal.com", hint: "So visit requests become bookings" },
     { done: checklist.portal_connected, label: "Connect your patient portal", hint: "Patients sign in once, no re-verifying" },
   ];

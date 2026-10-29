@@ -60,13 +60,14 @@ PORTAL_WEBHOOK_URL = os.getenv("PORTAL_WEBHOOK_URL", "")
 PORTAL_WEBHOOK_SECRET = os.getenv("PORTAL_WEBHOOK_SECRET", "")
 
 # ---- Staff console sessions ----
-# SESSION_SECRET signs staff session tokens. STAFF_ACCESS_CODE is the shared
-# sign-in code for the console until per-user auth (Clerk/Supabase) is wired.
-# In development both fall back to demo values so the app runs out of the box;
-# production refuses to start staff sign-in without them (see api/staff_auth.py).
+# SESSION_SECRET gates staff sign-in (production refuses it unset). Staff use
+# individual accounts with MFA (see api/staff_auth.py and scripts/create_staff_user.py);
+# STAFF_ACCESS_CODE is the shared code for the synthetic-data demo and works only
+# when DEMO_MODE is on.
 SESSION_SECRET = os.getenv("SESSION_SECRET", "" if APP_ENV == "production" else _DEV_ONLY)
 STAFF_ACCESS_CODE = os.getenv("STAFF_ACCESS_CODE", "" if APP_ENV == "production" else "aegistriage-demo")
-SESSION_TTL_HOURS = int(os.getenv("SESSION_TTL_HOURS", "12"))
+SESSION_TTL_HOURS = int(os.getenv("SESSION_TTL_HOURS", "8"))
+STAFF_IDLE_MINUTES = int(os.getenv("STAFF_IDLE_MINUTES", "15"))
 CORS_ORIGINS = [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",") if o.strip()]
 
 # ---- Async / queues ----

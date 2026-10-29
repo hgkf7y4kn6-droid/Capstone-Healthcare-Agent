@@ -145,6 +145,53 @@ CREATE TABLE IF NOT EXISTS refill_confirmations (
     updated_at              TEXT NOT NULL,
     FOREIGN KEY (ticket_number) REFERENCES support_tickets(ticket_number)
 );
+
+-- Append-only, hash-chained record of who touched what (see data/audit_log.py).
+-- No message text or chart content: ids, actions and outcomes only.
+CREATE TABLE IF NOT EXISTS audit_log (
+    seq        INTEGER PRIMARY KEY,
+    ts         TEXT NOT NULL,
+    actor      TEXT NOT NULL,
+    actor_role TEXT NOT NULL,
+    action     TEXT NOT NULL,
+    resource   TEXT,
+    patient_id INTEGER,
+    outcome    TEXT NOT NULL,
+    detail     TEXT,
+    prev_hash  TEXT NOT NULL,
+    hash       TEXT NOT NULL
+);
+CREATE TRIGGER IF NOT EXISTS audit_log_no_update BEFORE UPDATE ON audit_log
+BEGIN SELECT RAISE(ABORT, 'audit_log is append-only'); END;
+CREATE TRIGGER IF NOT EXISTS audit_log_no_delete BEFORE DELETE ON audit_log
+BEGIN SELECT RAISE(ABORT, 'audit_log is append-only'); END;
+
+-- Individual staff accounts and their server-side sessions (api/staff_auth.py).
+CREATE TABLE IF NOT EXISTS staff_users (
+    user_id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    email          TEXT NOT NULL UNIQUE,
+    name           TEXT NOT NULL,
+    role           TEXT NOT NULL,          -- admin | provider | front_desk
+    password_hash  TEXT NOT NULL,
+    totp_secret    TEXT NOT NULL,
+    last_totp_step INTEGER NOT NULL DEFAULT 0,
+    failed_logins  INTEGER NOT NULL DEFAULT 0,
+    locked_until   INTEGER NOT NULL DEFAULT 0,
+    active         INTEGER NOT NULL DEFAULT 1,
+    created_at     TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS staff_sessions (
+    token_hash TEXT PRIMARY KEY,           -- sha256 of the cookie value; the value itself is never stored
+    session_id TEXT NOT NULL,
+    user_id    INTEGER,                    -- NULL for demo-code sessions
+    name       TEXT NOT NULL,
+    role       TEXT NOT NULL,
+    demo       INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    last_seen  INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL,
+    revoked_at INTEGER
+);
 """
 
 

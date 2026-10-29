@@ -27,7 +27,7 @@ from typing import Literal, Optional
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -37,7 +37,8 @@ import config
 from version import __version__
 from api import staff_auth
 from api.portal_auth import PortalAuthError, create_test_token, decode_portal_token, require_scope, resolve_patient
-from data import patient_db as db
+from data import audit_log, patient_db as db
+from data import staff_store
 from data.bootstrap import ensure_ready
 from monitoring.logging_utils import log_event, read_events
 from workflows.safety import DISCLAIMER
@@ -76,6 +77,15 @@ CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';
 @app.middleware("http")
 async def _security_headers(request: Request, call_next):
     response = await call_next(request)
+    actor = getattr(request.state, "staff", None) or getattr(request.state, "patient", None)
+    if actor and response.status_code >= 400:  # the attempt was logged up front; add how it ended
+        try:
+            route = request.scope.get("route")
+            audit_log.record(actor["sub"], actor.get("role", "patient"),
+                             f"{request.method} {getattr(route, 'path', request.url.path)}",
+                             outcome=f"http_{response.status_code}", patient_id=actor.get("patient_id"))
+        except Exception:
+            log_event("audit_failure", {"path": request.url.path})
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("X-Frame-Options", "DENY")
@@ -139,6 +149,8 @@ def require_patient(request: Request) -> dict:
         patient = resolve_patient(payload)
     except PortalAuthError as e:
         raise HTTPException(e.status_code, e.message)
+    request.state.patient = {"sub": f"patient:{patient['patient_id']}", "role": "patient", "patient_id": patient["patient_id"]}
+    audit_log.record_request(request, request.state.patient["sub"], "patient", patient["patient_id"])
     return {"payload": payload, "patient": patient}
 
 
@@ -177,17 +189,131 @@ class SignIn(BaseModel):
     name: str = Field(default="", max_length=60)
 
 
+class Login(BaseModel):
+    email: str = Field(min_length=3, max_length=120)
+    password: str = Field(min_length=1, max_length=200)
+    otp: str = Field(min_length=6, max_length=8)
+
+
+def _client(request: Request) -> str:
+    return request.client.host if request.client else "unknown"
+
+
 @app.post("/api/auth/staff")
-def staff_sign_in(body: SignIn, request: Request):
-    client = request.client.host if request.client else "unknown"
-    session = staff_auth.sign_in(body.code, body.name, client)
+def staff_sign_in(body: SignIn, request: Request, response: Response):
+    """Shared-code sign-in. Demo mode only."""
+    try:
+        session = staff_auth.demo_sign_in(body.code, body.name, _client(request))
+    except HTTPException as e:
+        audit_log.record("shared-code", "none", "auth.demo_sign_in", outcome=f"http_{e.status_code}")
+        raise
+    audit_log.record(session["name"], session["role"], "auth.demo_sign_in")
     log_event("staff_sign_in", {"name": session["name"]})
-    return session
+    return staff_auth.set_cookie(response, session)
+
+
+@app.post("/api/auth/staff/login")
+def staff_login(body: Login, request: Request, response: Response):
+    try:
+        session = staff_auth.login(body.email, body.password, body.otp, _client(request))
+    except HTTPException as e:
+        audit_log.record(body.email.strip().lower(), "none", "auth.login", outcome=f"http_{e.status_code}")
+        raise
+    audit_log.record(session["name"], session["role"], "auth.login")
+    log_event("staff_sign_in", {"name": session["name"]})
+    return staff_auth.set_cookie(response, session)
+
+
+@app.post("/api/auth/staff/logout")
+def staff_logout(response: Response, staff: dict = Depends(staff_auth.require_staff)):
+    staff_auth.sign_out(staff["token"])
+    audit_log.record(staff["sub"], staff["role"], "auth.logout")
+    staff_auth.clear_cookie(response)
+    return {"ok": True}
 
 
 @app.get("/api/auth/staff/me")
 def staff_me(staff: dict = Depends(staff_auth.require_staff)):
-    return {"name": staff["sub"], "role": staff["role"], "expires_at": staff["exp"]}
+    return {"name": staff["sub"], "role": staff["role"], "expires_at": staff["exp"], "demo": staff["demo"],
+            "idle_timeout_minutes": config.STAFF_IDLE_MINUTES}
+
+
+# --------------------------------------------------------------------------- admin: accounts + audit
+
+class NewStaffUser(BaseModel):
+    email: str = Field(min_length=3, max_length=120)
+    name: str = Field(min_length=1, max_length=60)
+    role: Literal["admin", "provider", "front_desk"]
+    password: str = Field(min_length=staff_auth.MIN_PASSWORD, max_length=200)
+
+
+admin_only = staff_auth.require_role("admin")
+
+
+@app.get("/api/staff/users")
+def staff_users(staff: dict = Depends(admin_only)):
+    return {"users": staff_store.list_users()}
+
+
+@app.post("/api/staff/users", status_code=201)
+def staff_create_user(body: NewStaffUser, staff: dict = Depends(admin_only)):
+    """Returns the authenticator secret once; it can't be read back."""
+    try:
+        user = staff_auth.create_account(body.email, body.name, body.role, body.password)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    except Exception:
+        raise HTTPException(409, "An account with that email already exists.")
+    audit_log.record(staff["sub"], staff["role"], "staff_user.create", resource=f"user_id={user['user_id']}",
+                     detail={"role": body.role})
+    return user
+
+
+def _target_user(user_id: int) -> dict:
+    user = staff_store.get_user(user_id)
+    if not user:
+        raise HTTPException(404, "Account not found.")
+    return user
+
+
+@app.post("/api/staff/users/{user_id}/deactivate")
+def staff_deactivate_user(user_id: int, staff: dict = Depends(admin_only)):
+    user = _target_user(user_id)
+    if user["role"] == "admin" and user["active"] and staff_store.count_active_admins() <= 1:
+        raise HTTPException(409, "That's the last active admin. Add another admin first.")
+    staff_store.set_active(user_id, False)
+    ended = staff_store.revoke_user_sessions(user_id, int(time.time()))
+    audit_log.record(staff["sub"], staff["role"], "staff_user.deactivate", resource=f"user_id={user_id}",
+                     detail={"sessions_ended": ended})
+    return {"user_id": user_id, "active": False, "sessions_ended": ended}
+
+
+@app.post("/api/staff/users/{user_id}/activate")
+def staff_activate_user(user_id: int, staff: dict = Depends(admin_only)):
+    _target_user(user_id)
+    staff_store.set_active(user_id, True)
+    audit_log.record(staff["sub"], staff["role"], "staff_user.activate", resource=f"user_id={user_id}")
+    return {"user_id": user_id, "active": True}
+
+
+@app.post("/api/staff/users/{user_id}/revoke-sessions")
+def staff_revoke_sessions(user_id: int, staff: dict = Depends(admin_only)):
+    _target_user(user_id)
+    ended = staff_store.revoke_user_sessions(user_id, int(time.time()))
+    audit_log.record(staff["sub"], staff["role"], "staff_user.revoke_sessions", resource=f"user_id={user_id}",
+                     detail={"sessions_ended": ended})
+    return {"user_id": user_id, "sessions_ended": ended}
+
+
+@app.get("/api/staff/audit")
+def staff_audit(limit: int = 100, patient_id: Optional[int] = None, before_seq: Optional[int] = None,
+                staff: dict = Depends(admin_only)):
+    return {"entries": audit_log.list_entries(limit, patient_id, before_seq)}
+
+
+@app.get("/api/staff/audit/verify")
+def staff_audit_verify(staff: dict = Depends(admin_only)):
+    return audit_log.verify_chain()
 
 
 # --------------------------------------------------------------------------- staff: today
@@ -226,7 +352,7 @@ def staff_overview(staff: dict = Depends(staff_auth.require_staff)):
         "checklist": {
             "calendar_connected": bool(config.CALCOM_API_KEY),
             "portal_connected": bool(config.PORTAL_WEBHOOK_URL),
-            "own_access_code": config.STAFF_ACCESS_CODE not in ("", "aegistriage-demo"),
+            "staff_accounts": staff_store.count_users() > 0,
             "patients_loaded": len(patients) > 0,
         },
     }
@@ -404,7 +530,7 @@ def staff_submit_refill(body: StaffRefill, staff: dict = Depends(staff_auth.requ
 
 
 @app.post("/api/staff/reviews/{review_id}/decision")
-def staff_decide_review(review_id: int, body: ReviewDecision, staff: dict = Depends(staff_auth.require_staff)):
+def staff_decide_review(review_id: int, body: ReviewDecision, staff: dict = Depends(staff_auth.require_role("provider", "admin"))):
     review = next((r for r in db.list_provider_review() if r["review_id"] == review_id), None)
     if not review:
         raise HTTPException(404, "Review not found.")

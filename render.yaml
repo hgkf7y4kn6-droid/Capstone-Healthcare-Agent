@@ -25,7 +25,7 @@ services:
         generateValue: true
       - key: PORTAL_JWT_SECRET
         generateValue: true
-      - key: STAFF_ACCESS_CODE
+      - key: STAFF_ACCESS_CODE   # demo code only (DEMO_MODE=true); real staff use accounts
         sync: false
       - key: CORS_ORIGINS
         sync: false
