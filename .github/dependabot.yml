@@ -1,0 +1,41 @@
+# Weekly dependency updates. Minor and patch bumps arrive grouped in one PR per
+# ecosystem; security fixes arrive on their own as soon as an advisory is published.
+# A 7-day cooldown keeps brand-new (possibly hijacked) releases out.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule: {interval: weekly}
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7  # skip versions under a week old (new releases are where hijacked packages show up)
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: npm
+    directory: /web
+    schedule: {interval: weekly}
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7  # skip versions under a week old (new releases are where hijacked packages show up)
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: docker
+    directory: /
+    schedule: {interval: weekly}
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7  # skip versions under a week old (new releases are where hijacked packages show up)
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: {interval: weekly}
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7  # skip versions under a week old (new releases are where hijacked packages show up)
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]

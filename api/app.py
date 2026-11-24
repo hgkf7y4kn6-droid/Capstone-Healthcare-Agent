@@ -36,6 +36,7 @@ from pydantic import BaseModel, Field
 import config
 from version import __version__
 from api import clerk_auth, staff_auth
+from api.client_ip import client_ip
 from api.portal_auth import PortalAuthError, create_test_token, decode_portal_token, require_scope, resolve_patient
 from data import audit_log, patient_db as db
 from data import staff_store
@@ -209,7 +210,7 @@ class Login(BaseModel):
 
 
 def _client(request: Request) -> str:
-    return request.client.host if request.client else "unknown"
+    return client_ip(request)
 
 
 @app.post("/api/auth/staff")
