@@ -17,14 +17,15 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
     from slowapi import Limiter
-    from slowapi.util import get_remote_address
+
+    from api.client_ip import client_ip
 
     def _key_func(request):
         """Rate-limit key: the verified patient identity if the JWT was
         already decoded onto request.state by the auth dependency, else
         fall back to remote address (e.g. for unauthenticated attempts)."""
         patient_sub = getattr(request.state, "portal_patient_sub", None)
-        return patient_sub or get_remote_address(request)
+        return patient_sub or client_ip(request)
 
     limiter = Limiter(key_func=_key_func)
     SLOWAPI_AVAILABLE = True

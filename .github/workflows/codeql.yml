@@ -1,0 +1,36 @@
+# Static analysis for security bugs (free on public repositories). Results appear under
+# Security > Code scanning. build-mode none: no build step needed for these languages.
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "23 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, javascript-typescript, actions]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: github/codeql-action/init@e0462179768953fd6790193e15caaef674ff709e # v4.39.4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+          queries: security-extended
+      - uses: github/codeql-action/analyze@e0462179768953fd6790193e15caaef674ff709e # v4.39.4
+        with:
+          category: "/language:${{ matrix.language }}"
